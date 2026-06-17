@@ -54,17 +54,14 @@ app.commandLine.appendSwitch("js-flags", "--max-old-space-size=8192")
 // Sentry removed for Halotec Code local-first fork (US-004).
 
 // URL configuration (exported for use in other modules)
-// In packaged app, ALWAYS use production URL to prevent localhost leaking into releases
-// In dev mode, allow override via MAIN_VITE_API_URL env variable
+// Halotec Code is local-first; these helpers remain for any internal caller
+// that needs a base URL but no longer point at a remote host.
 export function getBaseUrl(): string {
-  if (app.isPackaged) {
-    return "https://21st.dev"
-  }
-  return import.meta.env.MAIN_VITE_API_URL || "https://21st.dev"
+  return "http://localhost"
 }
 
 export function getAppUrl(): string {
-  return process.env.ELECTRON_RENDERER_URL || "https://21st.dev/agents"
+  return process.env.ELECTRON_RENDERER_URL || "http://localhost"
 }
 
 // Auth manager singleton (use the one from auth-manager module)
@@ -76,47 +73,28 @@ export function getAuthManager(): AuthManager {
 }
 
 // Handle auth code from deep link (exported for IPC handlers)
+// Halotec Code (US-006): local-only auth; the deep link is accepted but
+// no remote exchange happens. The local user is always authenticated.
 export async function handleAuthCode(code: string): Promise<void> {
-  console.log("[Auth] Handling auth code:", code.slice(0, 8) + "...")
+  console.log("[Auth] Handling auth code (local-first, no-op):", code.slice(0, 8) + "...")
 
   try {
     const authData = await authManager.exchangeCode(code)
-    console.log("[Auth] Success for user:", authData.user.email)
+    console.log("[Auth] Local session established for:", authData.user.email)
 
-    // Track successful authentication
+    // Analytics hook is a no-op in Halotec Code.
     trackAuthCompleted(authData.user.id, authData.user.email)
 
-    // Fetch and set subscription plan for analytics
     try {
       const planData = await authManager.fetchUserPlan()
       if (planData) {
         setSubscriptionPlan(planData.plan)
       }
     } catch (e) {
-      console.warn("[Auth] Failed to fetch user plan for analytics:", e)
+      console.warn("[Auth] Failed to fetch local plan:", e)
     }
 
-    // Set desktop token cookie using persist:main partition
-    const ses = session.fromPartition("persist:main")
-    try {
-      // First remove any existing cookie to avoid HttpOnly conflict
-      await ses.cookies.remove(getBaseUrl(), "x-desktop-token")
-      await ses.cookies.set({
-        url: getBaseUrl(),
-        name: "x-desktop-token",
-        value: authData.token,
-        expirationDate: Math.floor(
-          new Date(authData.expiresAt).getTime() / 1000,
-        ),
-        httpOnly: false,
-        secure: getBaseUrl().startsWith("https"),
-        sameSite: "lax" as const,
-      })
-      console.log("[Auth] Desktop token cookie set")
-    } catch (cookieError) {
-      // Cookie setting is optional - auth data is already saved to disk
-      console.warn("[Auth] Cookie set failed (non-critical):", cookieError)
-    }
+    // Cookie block removed (US-006): no remote domain to set cookies on.
 
     // Notify all windows and reload them to show app
     const windows = getAllWindows()
@@ -125,30 +103,24 @@ export async function handleAuthCode(code: string): Promise<void> {
         if (win.isDestroyed()) continue
         win.webContents.send("auth:success", authData.user)
 
-        // Use stable window ID (main, window-2, etc.) instead of Electron's numeric ID
         const stableId = windowManager.getStableId(win)
 
         if (process.env.ELECTRON_RENDERER_URL) {
-          // Pass window ID via query param for dev mode
           const url = new URL(process.env.ELECTRON_RENDERER_URL)
           url.searchParams.set("windowId", stableId)
           win.loadURL(url.toString())
         } else {
-          // Pass window ID via hash for production
           win.loadFile(join(__dirname, "../renderer/index.html"), {
             hash: `windowId=${stableId}`,
           })
         }
       } catch (error) {
-        // Window may have been destroyed during iteration
         console.warn("[Auth] Failed to reload window:", error)
       }
     }
-    // Focus the first window
     windows[0]?.focus()
   } catch (error) {
-    console.error("[Auth] Exchange failed:", error)
-    // Broadcast auth error to all windows (not just focused)
+    console.error("[Auth] Local auth failed:", error)
     for (const win of getAllWindows()) {
       try {
         if (!win.isDestroyed()) {
@@ -860,27 +832,9 @@ if (gotTheLock) {
     // Track app opened (now with correct user ID if authenticated)
     trackAppOpened()
 
-    // Set up callback to update cookie when token is refreshed
-    authManager.setOnTokenRefresh(async (authData) => {
-      console.log("[Auth] Token refreshed, updating cookie...")
-      const ses = session.fromPartition("persist:main")
-      try {
-        await ses.cookies.set({
-          url: getBaseUrl(),
-          name: "x-desktop-token",
-          value: authData.token,
-          expirationDate: Math.floor(
-            new Date(authData.expiresAt).getTime() / 1000,
-          ),
-          httpOnly: false,
-          secure: getBaseUrl().startsWith("https"),
-          sameSite: "lax" as const,
-        })
-        console.log("[Auth] Desktop token cookie updated after refresh")
-      } catch (err) {
-        console.error("[Auth] Failed to update cookie:", err)
-      }
-    })
+    // Token-refresh cookie callback removed (US-006): local-first auth
+    // does not maintain a remote session cookie. The LocalAuthService
+    // accepts and ignores setOnTokenRefresh for API parity.
 
     // Initialize database
     try {
