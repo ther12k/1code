@@ -100,8 +100,8 @@
         "renderer/lib/remote-trpc.ts and remote-api.ts removed or stubbed to throw/no-op"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Commit 7c0a563. remote-trpc.ts and remote-api.ts rewritten as no-op stubs. All 21 tRPC methods across agents/automations/github/linear/teams return safe defaults (empty arrays, { type: 'free' }, { connected: false }, no-op mutations). All 11 remote-api methods either return [] or throw 'local-only' error. 15+ consumer files unchanged — they see empty remote backend, which hides every Pro/Max/background-cloud-agent/remote-sandbox/1code.dev-API affordance (no data → no UI). Validation: tsc 116 errors (baseline 118, -2 fixed), bun build succeeded in 5m with 8GB heap. Side benefit: subscription check in agents-beta-tab returns { type: 'free' }, paid-plan gate stays closed in non-dev."
     },
     {
       "id": "US-008",
