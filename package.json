@@ -3,7 +3,7 @@
   "version": "0.0.72",
   "private": true,
   "description": "1Code - UI for parallel work with AI agents",
-  "homepage": "https://21st.dev",
+  "homepage": "https://internal.halotec/code-desktop",
   "author": {
     "name": "21st.dev",
     "email": "support@21st.dev"
@@ -140,14 +140,14 @@
     "vite": "^6.3.4"
   },
   "build": {
-    "appId": "dev.21st.agents",
-    "productName": "1Code",
+    "appId": "id.halotec.code",
+    "productName": "Halotec Code",
     "npmRebuild": true,
     "protocols": [
       {
-        "name": "1Code",
+        "name": "Halotec Code",
         "schemes": [
-          "twentyfirst-agents"
+          "halotec-code"
         ]
       }
     ],
@@ -253,7 +253,7 @@
     },
     "publish": {
       "provider": "generic",
-      "url": "https://cdn.21st.dev/releases/desktop"
+      "url": "https://internal.halotec/releases/code-desktop"
     }
   },
   "pnpm": {

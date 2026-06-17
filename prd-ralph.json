@@ -1,0 +1,143 @@
+{
+  "project": "Halotec Code (fork of 21st-dev/1code)",
+  "branchName": "halotec-code/phase-1",
+  "baseRef": "v0.0.72 (9f1bc76)",
+  "description": "Phase 1: rebrand + remove all external cloud/telemetry/auth/update dependencies while keeping local agent execution.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Rebrand package.json build metadata",
+      "description": "As a Halotec operator, I want the desktop app's package.json to carry Halotec branding so the binary, appId, protocol, and publish URL all reflect the local-first fork.",
+      "acceptanceCriteria": [
+        "productName = 'Halotec Code'",
+        "appId = 'id.halotec.code'",
+        "homepage removed or replaced with internal placeholder",
+        "protocol scheme = 'halotec-code'",
+        "publish.url replaced (no cdn.21st.dev)"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Remove posthog / sentry / electron-updater dependencies",
+      "description": "As a Halotec operator, I want telemetry and update deps removed from package.json so the install footprint and audit surface are clean.",
+      "acceptanceCriteria": [
+        "posthog-js removed from dependencies",
+        "posthog-node removed from dependencies",
+        "@sentry/electron removed from dependencies",
+        "electron-updater removed from dependencies",
+        "bun install completes without dep-resolution failure for these packages"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Replace analytics.ts with no-op exports (main + renderer)",
+      "description": "As a Halotec operator, I want the analytics modules to keep their public surface but do nothing, so existing callers compile and run unchanged.",
+      "acceptanceCriteria": [
+        "src/main/lib/analytics.ts exports track/identify/optOut/etc as no-op functions",
+        "src/renderer/lib/analytics.ts exports track/identify/optOut/etc as no-op functions",
+        "no posthog-js or posthog-node import remains in either file"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Strip Sentry init/imports from main, preload, renderer",
+      "description": "As a Halotec operator, I want all Sentry integration removed so the app has no third-party error reporting surface.",
+      "acceptanceCriteria": [
+        "No @sentry/electron import in src/main/index.ts",
+        "No Sentry.* import in src/preload/index.ts",
+        "No Sentry.* import in src/renderer/*",
+        "No IPC channels for Sentry remain in preload API surface"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Replace auto-updater with no-op + remove update IPC + hide update UI",
+      "description": "As a Halotec operator, I want in-app update checks disabled, the IPC handlers removed, and the update UI hidden so the app never contacts cdn.21st.dev.",
+      "acceptanceCriteria": [
+        "src/main/lib/auto-updater.ts becomes a no-op module that exports the same public surface",
+        "update-related IPC handlers removed from src/main/index.ts",
+        "src/renderer/lib/hooks/use-update-checker.ts becomes a no-op hook returning { available: false }",
+        "Update UI affordances hidden or removed in renderer"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "LocalAuthService replacing cloud auth (auth-store, oauth, consumers)",
+      "description": "As a Halotec operator, I want the auth layer to be a local-only stub so there is no token exchange, refresh, or remote API call.",
+      "acceptanceCriteria": [
+        "src/main/lib/auth/local-auth-service.ts exists with LocalAuthService",
+        "No remote HTTP calls in auth flow (no /api/auth/*, no exchange, no refresh)",
+        "Always returns a local user/profile (id/email/name from a configurable local identity)",
+        "All consumers in main/index.ts and renderer use LocalAuthService"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Hide subscription / Pro / Max / cloud-agent / remote-sandbox / 1code.dev API UI",
+      "description": "As a Halotec operator, I want all paid-tier and cloud-only UI affordances removed or hidden so users don't see features the local fork does not support.",
+      "acceptanceCriteria": [
+        "No Pro/Max/billing UI surfaces remain in renderer (or are visibly disabled with a 'local-only build' notice)",
+        "No 'background cloud agent' affordance",
+        "No 'remote sandbox import' or 1code.dev API task UI",
+        "renderer/lib/remote-trpc.ts and remote-api.ts removed or stubbed to throw/no-op"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "rg sweep clean for 21st.dev / 1code.dev / posthog / sentry / electron-updater / cdn.21st",
+      "description": "As a Halotec operator, I want a final grep to confirm no external references remain in source.",
+      "acceptanceCriteria": [
+        "rg -n '21st\\.dev|1code\\.dev|posthog|sentry|electron-updater|cdn\\.21st' src/ package.json README.md CONTRIBUTING.md returns 0 hits (excluding build outputs and node_modules)"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Run bun install + ts:check + build",
+      "description": "As a Halotec operator, I want the build pipeline to run end-to-end so the fork is shippable.",
+      "acceptanceCriteria": [
+        "bun install completes (no dep-resolution failure)",
+        "bun run ts:check completes (tsgo or tsc fallback)",
+        "bun run build produces out/"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-010",
+      "title": "README local-first security notes + removed-cloud-features section",
+      "description": "As a Halotec operator, I want the README to document that this is a local-first fork and list which cloud features were removed.",
+      "acceptanceCriteria": [
+        "README has a 'Local-first / removed cloud features' section listing: telemetry, Sentry, auto-update, cloud auth, Pro/Max/subscription, background cloud agents, 1code.dev API",
+        "README notes where local data is stored (userData, ~/.halotec-code)"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
