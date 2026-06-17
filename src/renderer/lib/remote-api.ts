@@ -1,20 +1,17 @@
 /**
- * Remote API - wrapper around tRPC client for web backend
- * Provides clean interface for fetching remote sandbox data
+ * Remote API — no-op stub for the Halotec Code local-only fork.
+ *
+ * The fork does not contact 21st.dev / 1code.dev. All collection reads
+ * return empty arrays, all writes are no-ops, and sandbox-file operations
+ * throw a clear "local-only" error so any consumer that does try to fetch
+ * a remote sandbox file gets a deterministic failure rather than a hang.
+ *
+ * Consumers compile and run unchanged — they just see an empty remote
+ * backend (no teams, no remote sandbox chats, no sandbox file fetches).
  */
-import { remoteTrpc } from "./remote-trpc"
 
-// API base URL - dynamically fetched from main process
-let API_BASE: string | null = null
+const LOCAL_ONLY = "Halotec Code is a local-only build: remote API is disabled"
 
-async function getApiBase(): Promise<string> {
-  if (!API_BASE) {
-    API_BASE = await window.desktopApi?.getApiBaseUrl() || "https://21st.dev"
-  }
-  return API_BASE
-}
-
-// Re-export types for convenience
 export type Team = {
   id: string
   name: string
@@ -27,7 +24,7 @@ export type RemoteChat = {
   sandbox_id: string | null
   meta: {
     repository?: string
-    github_repo?: string // Automation-created chats use this field
+    github_repo?: string
     branch?: string | null
     originalSandboxId?: string | null
     isQuickSetup?: boolean
@@ -53,104 +50,39 @@ export type RemoteChatWithSubChats = RemoteChat & {
 }
 
 export const remoteApi = {
-  /**
-   * Fetch user's teams (same as web)
-   */
   async getTeams(): Promise<Team[]> {
-    const teams = await remoteTrpc.teams.getUserTeams.query()
-    return teams.map((t) => ({ id: t.id, name: t.name }))
+    return []
   },
 
-  /**
-   * Fetch all agent chats for a team (same as web)
-   */
-  async getAgentChats(teamId: string): Promise<RemoteChat[]> {
-    const chats = await remoteTrpc.agents.getAgentChats.query({ teamId })
-    return chats as RemoteChat[]
+  async getAgentChats(_teamId: string): Promise<RemoteChat[]> {
+    return []
   },
 
-  /**
-   * Fetch a single agent chat with all sub-chats (same as web)
-   */
-  async getAgentChat(chatId: string): Promise<RemoteChatWithSubChats> {
-    const chat = await remoteTrpc.agents.getAgentChat.query({ chatId })
-    return chat as RemoteChatWithSubChats
+  async getAgentChat(_chatId: string): Promise<RemoteChatWithSubChats> {
+    throw new Error(LOCAL_ONLY)
   },
 
-  /**
-   * Fetch archived chats for a team (same as web)
-   */
-  async getArchivedChats(teamId: string): Promise<RemoteChat[]> {
-    const chats = await remoteTrpc.agents.getArchivedChats.query({ teamId })
-    return chats as RemoteChat[]
+  async getArchivedChats(_teamId: string): Promise<RemoteChat[]> {
+    return []
   },
 
-  /**
-   * Archive a chat
-   */
-  async archiveChat(chatId: string): Promise<void> {
-    await remoteTrpc.agents.archiveChat.mutate({ chatId })
+  async archiveChat(_chatId: string): Promise<void> {},
+
+  async archiveChatsBatch(_chatIds: string[]): Promise<{ archivedCount: number }> {
+    return { archivedCount: 0 }
   },
 
-  /**
-   * Archive multiple chats at once
-   */
-  async archiveChatsBatch(chatIds: string[]): Promise<{ archivedCount: number }> {
-    return await remoteTrpc.agents.archiveChatsBatch.mutate({ chatIds })
+  async restoreChat(_chatId: string): Promise<void> {},
+
+  async renameSubChat(_subChatId: string, _name: string): Promise<void> {},
+
+  async renameChat(_chatId: string, _name: string): Promise<void> {},
+
+  async getSandboxDiff(_sandboxId: string): Promise<{ diff: string }> {
+    throw new Error(LOCAL_ONLY)
   },
 
-  /**
-   * Restore a chat from archive
-   */
-  async restoreChat(chatId: string): Promise<void> {
-    await remoteTrpc.agents.restoreChat.mutate({ chatId })
-  },
-
-  /**
-   * Rename a sub-chat
-   */
-  async renameSubChat(subChatId: string, name: string): Promise<void> {
-    await remoteTrpc.agents.renameSubChat.mutate({ subChatId, name })
-  },
-
-  /**
-   * Rename a chat (workspace)
-   */
-  async renameChat(chatId: string, name: string): Promise<void> {
-    await remoteTrpc.agents.renameChat.mutate({ chatId, name })
-  },
-
-  /**
-   * Get diff from a sandbox (via REST endpoint with signedFetch)
-   */
-  async getSandboxDiff(sandboxId: string): Promise<{ diff: string }> {
-    if (!window.desktopApi?.signedFetch) {
-      throw new Error("Desktop API not available")
-    }
-    const apiBase = await getApiBase()
-    const result = await window.desktopApi.signedFetch(
-      `${apiBase}/api/agents/sandbox/${sandboxId}/diff`
-    )
-    if (!result.ok) {
-      throw new Error(result.error || `Failed to fetch diff: ${result.status}`)
-    }
-    return result.data as { diff: string }
-  },
-
-  /**
-   * Get file content from a sandbox (via REST endpoint with signedFetch)
-   */
-  async getSandboxFile(sandboxId: string, path: string): Promise<{ content: string }> {
-    if (!window.desktopApi?.signedFetch) {
-      throw new Error("Desktop API not available")
-    }
-    const apiBase = await getApiBase()
-    const result = await window.desktopApi.signedFetch(
-      `${apiBase}/api/agents/sandbox/${sandboxId}/files?path=${encodeURIComponent(path)}`
-    )
-    if (!result.ok) {
-      throw new Error(result.error || `Failed to fetch file: ${result.status}`)
-    }
-    return result.data as { content: string }
+  async getSandboxFile(_sandboxId: string, _path: string): Promise<{ content: string }> {
+    throw new Error(LOCAL_ONLY)
   },
 }

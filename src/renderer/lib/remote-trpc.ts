@@ -1,67 +1,65 @@
 /**
- * tRPC client for remote web backend (21st.dev)
- * Uses signedFetch via IPC for authentication (no CORS issues)
+ * No-op tRPC client stub (Halotec Code local-only fork).
+ *
+ * The Halotec Code fork does not contact 21st.dev / 1code.dev. All remote
+ * queries return empty / safe defaults, all remote mutations are no-ops.
+ * Consumers compile and run unchanged — they just see an empty remote
+ * backend (no Pro/Max/subscription data, no remote sandbox chats, no
+ * automations, no remote GitHub/Linear integrations).
+ *
+ * Return types are intentionally `any` to preserve the consumer-side
+ * shape that the upstream tRPC client provided. This is a stub — the
+ * runtime values are empty/safe, not the upstream real values.
  */
-import { createTRPCClient, httpLink } from "@trpc/client"
-import type { AppRouter } from "../../../../web/server/api/root"
-import SuperJSON from "superjson"
 
-// Placeholder URL - actual base is fetched dynamically from main process
-const TRPC_PLACEHOLDER = "/__dynamic__/api/trpc"
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-// Cache the API base URL after first fetch
-let cachedApiBase: string | null = null
+type NoOpQuery = { query: (...args: any[]) => Promise<any> }
+type NoOpMutation = { mutate: (...args: any[]) => Promise<any> }
 
-async function getApiBase(): Promise<string> {
-  if (!cachedApiBase) {
-    cachedApiBase = await window.desktopApi?.getApiBaseUrl() || "https://21st.dev"
-  }
-  return cachedApiBase
-}
-
-/**
- * Custom fetch that goes through Electron IPC
- * Automatically adds auth token and bypasses CORS
- * Replaces placeholder URL with actual API base from env
- */
-const signedFetch: typeof fetch = async (input, init) => {
-  if (typeof window === "undefined" || !window.desktopApi?.signedFetch) {
-    throw new Error("Desktop API not available")
-  }
-
-  let url = typeof input === "string" ? input : input.toString()
-
-  // Replace placeholder with actual API base
-  if (url.startsWith("/__dynamic__")) {
-    const apiBase = await getApiBase()
-    url = url.replace("/__dynamic__", apiBase)
-  }
-
-  const result = await window.desktopApi.signedFetch(url, {
-    method: init?.method,
-    body: init?.body as string | undefined,
-    headers: init?.headers as Record<string, string> | undefined,
-  })
-
-  // Convert IPC result to Response-like object
-  return {
-    ok: result.ok,
-    status: result.status,
-    json: async () => result.data,
-    text: async () => JSON.stringify(result.data),
-  } as Response
-}
-
-/**
- * tRPC client connected to web backend
- * Fully typed, handles superjson automatically
- */
-export const remoteTrpc = createTRPCClient<AppRouter>({
-  links: [
-    httpLink({
-      url: TRPC_PLACEHOLDER,
-      fetch: signedFetch,
-      transformer: SuperJSON,
-    }),
-  ],
+const noopQuery = (value: any = null): NoOpQuery => ({
+  query: async () => value,
 })
+const noopList = (value: any[] = []): NoOpQuery => ({
+  query: async () => value,
+})
+const noopMutation = (value: any = undefined): NoOpMutation => ({
+  mutate: async () => value,
+})
+
+export const remoteTrpc = {
+  agents: {
+    archiveChat: noopMutation(),
+    archiveChatsBatch: noopMutation({ archivedCount: 0 }),
+    getAgentChat: noopQuery(),
+    getAgentChats: noopList([]),
+    // Subscription is the one query consumers actually inspect — return
+    // { type: "free" } so paid-plan UI gates stay closed in non-dev builds.
+    getAgentsSubscription: noopQuery({ type: "free" }),
+    getArchivedChats: noopList([]),
+    renameChat: noopMutation(),
+    renameSubChat: noopMutation(),
+    restoreChat: noopMutation(),
+  },
+  automations: {
+    createAutomation: noopMutation(),
+    deleteAutomation: noopMutation(),
+    getAutomation: noopQuery(),
+    getInboxChats: noopList([]),
+    getInboxUnreadCount: noopQuery({ count: 0 }),
+    listAutomations: noopList([]),
+    listExecutions: noopList([]),
+    markAllInboxItemsRead: noopMutation(),
+    markInboxItemRead: noopMutation(),
+    updateAutomation: noopMutation(),
+  },
+  github: {
+    getConnectionStatus: noopQuery({ connected: false }),
+  },
+  linear: {
+    getIntegration: noopQuery(),
+  },
+  teams: {
+    getUserTeams: noopList([]),
+  },
+}
