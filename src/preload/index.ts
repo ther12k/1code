@@ -24,49 +24,23 @@ contextBridge.exposeInMainWorld("desktopApi", {
   getVersion: () => ipcRenderer.invoke("app:version"),
   isPackaged: () => ipcRenderer.invoke("app:isPackaged"),
 
-  // Auto-update methods
-  checkForUpdates: (force?: boolean) => ipcRenderer.invoke("update:check", force),
-  downloadUpdate: () => ipcRenderer.invoke("update:download"),
-  installUpdate: () => ipcRenderer.invoke("update:install"),
-  setUpdateChannel: (channel: "latest" | "beta") => ipcRenderer.invoke("update:set-channel", channel),
-  getUpdateChannel: () => ipcRenderer.invoke("update:get-channel") as Promise<"latest" | "beta">,
+  // Auto-update methods — no-op shims for Halotec Code (US-005).
+  // Updates are distributed out-of-band. The IPC handlers were removed
+  // from the main process; these shims keep the renderer surface stable.
+  checkForUpdates: (_force?: boolean) => Promise.resolve(null),
+  downloadUpdate: () => Promise.resolve(false),
+  installUpdate: () => undefined,
+  setUpdateChannel: (_channel: "latest" | "beta") => Promise.resolve(false),
+  getUpdateChannel: () => Promise.resolve("latest" as const),
 
-  // Auto-update event listeners
-  onUpdateChecking: (callback: () => void) => {
-    const handler = () => callback()
-    ipcRenderer.on("update:checking", handler)
-    return () => ipcRenderer.removeListener("update:checking", handler)
-  },
-  onUpdateAvailable: (callback: (info: { version: string; releaseDate?: string }) => void) => {
-    const handler = (_event: unknown, info: { version: string; releaseDate?: string }) => callback(info)
-    ipcRenderer.on("update:available", handler)
-    return () => ipcRenderer.removeListener("update:available", handler)
-  },
-  onUpdateNotAvailable: (callback: () => void) => {
-    const handler = () => callback()
-    ipcRenderer.on("update:not-available", handler)
-    return () => ipcRenderer.removeListener("update:not-available", handler)
-  },
-  onUpdateProgress: (callback: (progress: { percent: number; bytesPerSecond: number; transferred: number; total: number }) => void) => {
-    const handler = (_event: unknown, progress: { percent: number; bytesPerSecond: number; transferred: number; total: number }) => callback(progress)
-    ipcRenderer.on("update:progress", handler)
-    return () => ipcRenderer.removeListener("update:progress", handler)
-  },
-  onUpdateDownloaded: (callback: (info: { version: string }) => void) => {
-    const handler = (_event: unknown, info: { version: string }) => callback(info)
-    ipcRenderer.on("update:downloaded", handler)
-    return () => ipcRenderer.removeListener("update:downloaded", handler)
-  },
-  onUpdateError: (callback: (error: string) => void) => {
-    const handler = (_event: unknown, error: string) => callback(error)
-    ipcRenderer.on("update:error", handler)
-    return () => ipcRenderer.removeListener("update:error", handler)
-  },
-  onUpdateManualCheck: (callback: () => void) => {
-    const handler = () => callback()
-    ipcRenderer.on("update:manual-check", handler)
-    return () => ipcRenderer.removeListener("update:manual-check", handler)
-  },
+  // Auto-update event listeners — no-op subscribers (main no longer emits).
+  onUpdateChecking: (_callback: () => void) => () => undefined,
+  onUpdateAvailable: (_callback: (info: { version: string; releaseDate?: string }) => void) => () => undefined,
+  onUpdateNotAvailable: (_callback: () => void) => () => undefined,
+  onUpdateProgress: (_callback: (progress: { percent: number; bytesPerSecond: number; transferred: number; total: number }) => void) => () => undefined,
+  onUpdateDownloaded: (_callback: (info: { version: string }) => void) => () => undefined,
+  onUpdateError: (_callback: (error: string) => void) => () => undefined,
+  onUpdateManualCheck: (_callback: () => void) => () => undefined,
 
   // Window controls
   windowMinimize: () => ipcRenderer.invoke("window:minimize"),

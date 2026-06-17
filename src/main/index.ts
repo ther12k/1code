@@ -11,12 +11,6 @@ import {
   trackAppOpened,
   trackAuthCompleted,
 } from "./lib/analytics"
-import {
-  checkForUpdates,
-  downloadUpdate,
-  initAutoUpdater,
-  setupFocusUpdateCheck,
-} from "./lib/auto-updater"
 import { closeDatabase, initDatabase } from "./lib/db"
 import {
   getLaunchDirectory,
@@ -586,9 +580,7 @@ if (gotTheLock) {
       copyright: "Copyright © 2026 21st.dev",
     })
 
-    // Track update availability for menu
-    let updateAvailable = false
-    let availableVersion: string | null = null
+    // Update state variables removed for Halotec Code (US-005).
     // Track devtools unlock state (hidden feature - 5 clicks on Beta tab)
     let devToolsUnlocked = false
 
@@ -610,27 +602,11 @@ if (gotTheLock) {
           label: app.name,
           submenu: [
             {
-              label: "About 1Code",
+              label: "About Halotec Code",
               click: () => app.showAboutPanel(),
             },
-            {
-              label: updateAvailable
-                ? `Update to v${availableVersion}...`
-                : "Check for Updates...",
-              click: () => {
-                // Send event to renderer to clear dismiss state
-                const win = getWindow()
-                if (win) {
-                  win.webContents.send("update:manual-check")
-                }
-                // If update is already available, start downloading immediately
-                if (updateAvailable) {
-                  downloadUpdate()
-                } else {
-                  checkForUpdates(true)
-                }
-              },
-            },
+            // "Check for Updates" removed for Halotec Code (US-005). Updates
+            // are distributed out-of-band.
             { type: "separator" },
             {
               label: "Settings...",
@@ -848,12 +824,7 @@ if (gotTheLock) {
       app.dock.setMenu(dockMenu)
     }
 
-    // Set update state and rebuild menu
-    const setUpdateAvailable = (available: boolean, version?: string) => {
-      updateAvailable = available
-      availableVersion = version || null
-      buildMenu()
-    }
+    // setUpdateAvailable removed for Halotec Code (US-005).
 
     // Unlock devtools and rebuild menu (called from renderer via IPC)
     const unlockDevTools = () => {
@@ -864,8 +835,6 @@ if (gotTheLock) {
       }
     }
 
-    // Expose setUpdateAvailable globally for auto-updater
-    ;(global as any).__setUpdateAvailable = setUpdateAvailable
     // Expose unlockDevTools globally for IPC handler
     ;(global as any).__unlockDevTools = unlockDevTools
 
@@ -924,16 +893,8 @@ if (gotTheLock) {
     // Create main window
     createMainWindow()
 
-    // Initialize auto-updater (production only)
-    if (app.isPackaged) {
-      await initAutoUpdater(getAllWindows)
-      // Setup update check on window focus (instead of periodic interval)
-      setupFocusUpdateCheck(getAllWindows)
-      // Check for updates 5 seconds after startup (force to bypass interval check)
-      setTimeout(() => {
-        checkForUpdates(true)
-      }, 5000)
-    }
+    // Auto-updater removed for Halotec Code (US-005). Updates are
+    // distributed out-of-band; no remote update server is contacted.
 
     // Warm up MCP cache 3 seconds after startup (background, non-blocking)
     // This populates the cache so all future sessions can use filtered MCP servers
