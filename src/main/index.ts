@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/electron/main"
 import { app, BrowserWindow, dialog, Menu, nativeImage, session } from "electron"
 import { existsSync, readFileSync, readlinkSync, unlinkSync } from "fs"
 import { createServer } from "http"
@@ -58,24 +57,7 @@ if (IS_DEV) {
 // under heavy multi-chat workloads. Must be set before app readiness/window creation.
 app.commandLine.appendSwitch("js-flags", "--max-old-space-size=8192")
 
-// Initialize Sentry before app is ready (production only)
-if (app.isPackaged && !IS_DEV) {
-  const sentryDsn = import.meta.env.MAIN_VITE_SENTRY_DSN
-  if (sentryDsn) {
-    try {
-      Sentry.init({
-        dsn: sentryDsn,
-      })
-      console.log("[App] Sentry initialized")
-    } catch (error) {
-      console.warn("[App] Failed to initialize Sentry:", error)
-    }
-  } else {
-    console.log("[App] Skipping Sentry initialization (no DSN configured)")
-  }
-} else {
-  console.log("[App] Skipping Sentry initialization (dev mode)")
-}
+// Sentry removed for Halotec Code local-first fork (US-004).
 
 // URL configuration (exported for use in other modules)
 // In packaged app, ALWAYS use production URL to prevent localhost leaking into releases

@@ -1,12 +1,7 @@
 import { contextBridge, ipcRenderer, webUtils } from "electron"
 import { exposeElectronTRPC } from "trpc-electron/main"
 
-// Only initialize Sentry in production to avoid IPC errors in dev mode
-if (process.env.NODE_ENV === "production") {
-  import("@sentry/electron/renderer").then((Sentry) => {
-    Sentry.init()
-  })
-}
+// Sentry removed for Halotec Code local-first fork (US-004).
 
 // Expose tRPC IPC bridge for type-safe communication
 exposeElectronTRPC()
