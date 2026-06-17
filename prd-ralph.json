@@ -86,8 +86,8 @@
         "All consumers in main/index.ts and renderer use LocalAuthService"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Commit 48307b0. LocalAuthService at src/main/lib/auth/local-auth-service.ts. auth-manager.ts is now a 13-LOC re-export shim (option A). 15+ consumer files unchanged. handleAuthCode cookie block + setOnTokenRefresh cookie block removed from main/index.ts. getBaseUrl/getAppUrl return localhost placeholder. auth-store.ts and oauth.ts untouched."
     },
     {
       "id": "US-007",
