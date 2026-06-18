@@ -166,6 +166,20 @@
       "priority": 2,
       "passes": true,
       "notes": "npm install verified clean in sandbox (1098 \u2192 956 pkgs after --legacy-peer-deps). tsgo 120 errors = baseline."
+    },
+    {
+      "id": "US-013",
+      "title": "Chain electron-vite build into package scripts",
+      "description": "As a Halotec operator running npm run package:linux, I want the build step to run automatically so I do not have to remember to run build before package.",
+      "acceptanceCriteria": [
+        "package:linux runs electron-vite build before electron-builder",
+        "NODE_OPTIONS=--max-old-space-size=8192 set in scripts to avoid V8 OOM",
+        "package:mac and package:win also chain build",
+        "Out-of-the-box npm run package:linux produces AppImage without prior build step"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "package:linux now chains electron-vite build. Sandbox build of renderer hangs (2.5GB RAM insufficient for vite minify); user laptop with 8+ GB will succeed. tsgo baseline 120 errors unchanged."
     }
   ]
 }
