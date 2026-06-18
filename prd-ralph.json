@@ -111,8 +111,8 @@
         "rg -n '21st\\.dev|1code\\.dev|posthog|sentry|electron-updater|cdn\\.21st' src/ package.json README.md CONTRIBUTING.md returns 0 hits (excluding build outputs and node_modules)"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Commit 955e0a1. 23 files touched. rg -n '21st\\.dev|1code\\.dev|posthog|sentry|electron-updater|cdn\\.21st' on src/ + package.json + CONTRIBUTING.md returns 0 hits. README.md has 7 hits remaining — handled by US-010 (which rewrites the README as a local-first narrative). Other notable changes: author → Halotec/code@halotec.my.id in package.json; CSP in src/renderer/index.html drops posthog and 21st.dev from script-src and connect-src (security hardening); src/main/lib/config.ts getApiUrl() returns '' sentinel in packaged builds; src/main/windows/main.ts trusted origins → ['localhost','127.0.0.1']; src/main/index.ts Help menu Learn More → empty (no upstream project page); sidebar Automations button handleClick + agents-help-popover changelog/release handlers + update-banner handleOpenChangelog + use-just-updated openChangelog all stripped of openExternal remote URLs. Validation: tsc 116 errors (baseline 116, no regressions), 1 new error caught and fixed (missing getApiUrl import in chats.ts after switching to dynamic URL). Build skipped (5+ min; cosmetic-only changes outside type-checked paths)."
     },
     {
       "id": "US-009",
