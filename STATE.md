@@ -4,10 +4,10 @@
 
 ## Snapshot
 - **Base:** 21st-dev/1code v0.0.72 (9f1bc76)
-- **Branch:** `halotec-code/phase-1` (16 commits ahead of main)
+- **Branch:** `halotec-code/phase-1` (21 commits ahead of main)
 - **Tests:** n/a (Electron app, no test suite in upstream)
-- **Last commit:** 80b9939 US-011 package rename
-- **Released tag:** `v0.0.73-halotec-phase1` (pushed to ther12k/1code)
+- **Last commit:** 00985b3 US-013 package:* script chain + NODE_OPTIONS=8GB
+- **Released tag:** `v0.0.75-halotec-phase1` (pushed to ther12k/1code)
 
 ## Completed Phases
 - US-001 rebrand package.json (b00c2e1)
@@ -22,9 +22,10 @@
 - US-010 README local-first rewrite: removed-cloud-features table + userData paths (2cfaecc)
 - US-011 package.json name 21st-desktop → halotec-code-desktop (80b9939)
 - US-012 .npmrc legacy-peer-deps=true for npm users (02eea2e)
+- US-013 chain electron-vite build + NODE_OPTIONS=8GB into package:* scripts (00985b3)
 
 ## Resolved (was blocker)
 - ~~node-pty prebuild missing on linux-x64~~ → NOT a bug. postinstall runs `electron-rebuild -f -w better-sqlite3,node-pty` which builds `pty.node` from source on Linux. Sandbox-only limitation; user build will work.
 
 ## Next action for Hermes
-All 12 prd-ralph stories pass. Branch + tag `v0.0.74-halotec-phase1` pushed to ther12k/1code fork. Sandbox verified: bun 1.3.14 + npm both install clean, postinstall + electron-rebuild + ts:check all baseline (120 errors). Awaiting user build + GUI verify on laptop.
+All 13 prd-ralph stories pass. Branch + tag `v0.0.75-halotec-phase1` pushed to ther12k/1code fork. \`npm run package:linux\` now self-contained (chains build + bumps heap). Awaiting user laptop build result.
