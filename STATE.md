@@ -4,7 +4,7 @@
 
 ## Snapshot
 - **Base:** 21st-dev/1code v0.0.72 (9f1bc76)
-- **Branch:** `halotec-code/phase-1` (11 commits ahead of main)
+- **Branch:** `halotec-code/phase-1` (15 commits ahead of main)
 - **Tests:** n/a (Electron app, no test suite in upstream)
 - **Last commit:** 2cfaecc US-010 README local-first rewrite
 
