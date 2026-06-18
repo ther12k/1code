@@ -26,4 +26,4 @@
 - ~~node-pty prebuild missing on linux-x64~~ → NOT a bug. postinstall runs `electron-rebuild -f -w better-sqlite3,node-pty` which builds `pty.node` from source on Linux. Sandbox-only limitation; user build will work.
 
 ## Next action for Hermes
-All 11 prd-ralph stories pass. Branch + tag `v0.0.73-halotec-phase1` pushed to ther12k/1code fork. Awaiting user build + GUI verify on laptop before further commits.
+All 11 prd-ralph stories pass. Branch + tag `v0.0.73-halotec-phase1` pushed to ther12k/1code fork. Sandbox verified: bun 1.3.14 installed, postinstall + electron-rebuild + ts:check all clean (120 errors = baseline). Awaiting user build + GUI verify on laptop before further commits.
