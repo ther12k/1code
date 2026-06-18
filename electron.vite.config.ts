@@ -3,6 +3,31 @@ import { resolve } from "path"
 import react from "@vitejs/plugin-react"
 import tailwindcss from "tailwindcss"
 import autoprefixer from "autoprefixer"
+import type { Plugin } from "vite"
+
+/**
+ * @shikijs/themes only ships one ayu variant (ayu-dark) and the renderer
+ * transitively requests non-existent subpaths like 'ayu-mirage' / 'ayu-light'
+ * during dep-resolution. Vite's `resolve.alias` is evaluated AFTER the
+ * package-exports check, so a missing `./ayu-mirage` specifier fails before
+ * the alias runs. This resolveId hook sits before that check and returns
+ * the ayu-dark module for any missing @shikijs/themes/<name> request.
+ */
+function shikijsThemeFallback(): Plugin {
+  const fallback = "@shikijs/themes/ayu-dark"
+  return {
+    name: "halotec-shikijs-theme-fallback",
+    enforce: "pre",
+    resolveId(source: string) {
+      if (source === fallback) return null
+      if (source.startsWith("@shikijs/themes/")) {
+        // Map ANY subpath to ayu-dark; @shikijs/themes/ayu-dark passes through
+        return fallback
+      }
+      return null
+    },
+  }
+}
 
 const isDev = process.env.NODE_ENV !== "production"
 
@@ -51,6 +76,9 @@ export default defineConfig({
   },
   renderer: {
     plugins: [
+      // Must be first — intercepts missing @shikijs/themes/<name> requests
+      // before Vite's package-exports check rejects them.
+      shikijsThemeFallback(),
       react({
         // In dev mode, use WDYR as JSX import source to track ALL component re-renders
         jsxImportSource: isDev
