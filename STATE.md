@@ -4,9 +4,10 @@
 
 ## Snapshot
 - **Base:** 21st-dev/1code v0.0.72 (9f1bc76)
-- **Branch:** `halotec-code/phase-1` (15 commits ahead of main)
+- **Branch:** `halotec-code/phase-1` (16 commits ahead of main)
 - **Tests:** n/a (Electron app, no test suite in upstream)
-- **Last commit:** 2cfaecc US-010 README local-first rewrite
+- **Last commit:** 80b9939 US-011 package rename
+- **Released tag:** `v0.0.73-halotec-phase1` (pushed to ther12k/1code)
 
 ## Completed Phases
 - US-001 rebrand package.json (b00c2e1)
@@ -19,6 +20,10 @@
 - US-008 rg sweep: 0 hits in src/ + package.json + CONTRIBUTING (955e0a1)
 - US-009 install tsgo devDep + validate bun install + ts:check + build (5a7275d)
 - US-010 README local-first rewrite: removed-cloud-features table + userData paths (2cfaecc)
+- US-011 package.json name 21st-desktop → halotec-code-desktop (80b9939)
+
+## Resolved (was blocker)
+- ~~node-pty prebuild missing on linux-x64~~ → NOT a bug. postinstall runs `electron-rebuild -f -w better-sqlite3,node-pty` which builds `pty.node` from source on Linux. Sandbox-only limitation; user build will work.
 
 ## Next action for Hermes
-All 10 prd-ralph stories pass. Release tag v0.1.0-halotec-phase-1 candidate. Awaiting user confirmation before merge to main + tag + push.
+All 11 prd-ralph stories pass. Branch + tag `v0.0.73-halotec-phase1` pushed to ther12k/1code fork. Awaiting user build + GUI verify on laptop before further commits.
