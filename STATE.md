@@ -4,10 +4,10 @@
 
 ## Snapshot
 - **Base:** 21st-dev/1code v0.0.72 (9f1bc76)
-- **Branch:** `halotec-code/phase-1` (21 commits ahead of main)
+- **Branch:** `halotec-code/phase-1` (22 commits ahead of main)
 - **Tests:** n/a (Electron app, no test suite in upstream)
-- **Last commit:** 00985b3 US-013 package:* script chain + NODE_OPTIONS=8GB
-- **Released tag:** `v0.0.75-halotec-phase1` (pushed to ther12k/1code)
+- **Last commit:** f0b8039 US-014 vite alias ayu-light → ayu-dark
+- **Released tag:** not pushed (PAT auth failed on tag push; branch is current)
 
 ## Completed Phases
 - US-001 rebrand package.json (b00c2e1)
@@ -23,9 +23,10 @@
 - US-011 package.json name 21st-desktop → halotec-code-desktop (80b9939)
 - US-012 .npmrc legacy-peer-deps=true for npm users (02eea2e)
 - US-013 chain electron-vite build + NODE_OPTIONS=8GB into package:* scripts (00985b3)
+- US-014 vite alias @shikijs/themes/ayu-light → ayu-dark (f0b8039)
 
 ## Resolved (was blocker)
 - ~~node-pty prebuild missing on linux-x64~~ → NOT a bug. postinstall runs `electron-rebuild -f -w better-sqlite3,node-pty` which builds `pty.node` from source on Linux. Sandbox-only limitation; user build will work.
 
 ## Next action for Hermes
-All 13 prd-ralph stories pass. Branch + tag `v0.0.75-halotec-phase1` pushed to ther12k/1code fork. \`npm run package:linux\` now self-contained (chains build + bumps heap). Awaiting user laptop build result.
+All 14 prd-ralph stories pass. Branch `halotec-code/phase-1` @ f0b8039 pushed to ther12k/1code. Awaiting user to `git pull && npm install && npm run package:linux`. Note: tag push blocked on this PAT — not a blocker.
