@@ -9,6 +9,12 @@
 - **Last commit:** f0b8039 US-014 vite alias ayu-light → ayu-dark
 - **Released tag:** not pushed (PAT auth failed on tag push; branch is current)
 
+## Phase 1 ✅ SHIPPED (local AppImage builds + runs)
+Branch `halotec-code/phase-1` tag `v0.0.77-halotec-phase1` — user confirmed Preferences/Models panel renders correctly on Linux laptop.
+
+## Phase 2 — in progress
+Custom Provider support for routing Claude + Codex through user-controlled gateways (9router, OpenRouter, etc.).
+
 ## Completed Phases
 - US-001 rebrand package.json (b00c2e1)
 - US-002 remove posthog/sentry/electron-updater deps (22486eb)
@@ -24,6 +30,7 @@
 - US-012 .npmrc legacy-peer-deps=true for npm users (02eea2e)
 - US-013 chain electron-vite build + NODE_OPTIONS=8GB into package:* scripts (00985b3)
 - US-014 vite alias @shikijs/themes/ayu-light → ayu-dark (f0b8039)
+- US-015 sync prd-ralph.json US-001..005 passes=true (Phase 1 shipped, JSON was stale)
 
 ## Resolved (was blocker)
 - ~~node-pty prebuild missing on linux-x64~~ → NOT a bug. postinstall runs `electron-rebuild -f -w better-sqlite3,node-pty` which builds `pty.node` from source on Linux. Sandbox-only limitation; user build will work.

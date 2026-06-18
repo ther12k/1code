@@ -1,8 +1,8 @@
 {
   "project": "Halotec Code (fork of 21st-dev/1code)",
   "branchName": "halotec-code/phase-1",
-  "baseRef": "v0.0.72 (9f1bc76)",
-  "description": "Phase 1: rebrand + remove all external cloud/telemetry/auth/update dependencies while keeping local agent execution.",
+  "baseRef": "v0.0.75 (c9624bf)",
+  "description": "Phase 2: Custom Provider support (Anthropic + OpenAI compatible) for routing Claude/Codex through user-controlled gateways like 9router.",
   "userStories": [
     {
       "id": "US-001",
@@ -16,8 +16,8 @@
         "publish.url replaced (no cdn.21st.dev)"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Verified on disk: matches all acceptance criteria. Committed in Phase 1."
     },
     {
       "id": "US-002",
@@ -31,8 +31,8 @@
         "bun install completes without dep-resolution failure for these packages"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Verified on disk: matches all acceptance criteria. Committed in Phase 1."
     },
     {
       "id": "US-003",
@@ -44,8 +44,8 @@
         "no posthog-js or posthog-node import remains in either file"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Verified on disk: matches all acceptance criteria. Committed in Phase 1."
     },
     {
       "id": "US-004",
@@ -58,8 +58,8 @@
         "No IPC channels for Sentry remain in preload API surface"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Verified on disk: matches all acceptance criteria. Committed in Phase 1."
     },
     {
       "id": "US-005",
@@ -72,8 +72,8 @@
         "Update UI affordances hidden or removed in renderer"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Verified on disk: matches all acceptance criteria. Committed in Phase 1."
     },
     {
       "id": "US-006",
@@ -101,7 +101,7 @@
       ],
       "priority": 7,
       "passes": true,
-      "notes": "Commit 7c0a563. remote-trpc.ts and remote-api.ts rewritten as no-op stubs. All 21 tRPC methods across agents/automations/github/linear/teams return safe defaults (empty arrays, { type: 'free' }, { connected: false }, no-op mutations). All 11 remote-api methods either return [] or throw 'local-only' error. 15+ consumer files unchanged \u2014 they see empty remote backend, which hides every Pro/Max/background-cloud-agent/remote-sandbox/1code.dev-API affordance (no data \u2192 no UI). Validation: tsc 116 errors (baseline 118, -2 fixed), bun build succeeded in 5m with 8GB heap. Side benefit: subscription check in agents-beta-tab returns { type: 'free' }, paid-plan gate stays closed in non-dev."
+      "notes": "Commit 7c0a563. remote-trpc.ts and remote-api.ts rewritten as no-op stubs. All 21 tRPC methods across agents/automations/github/linear/teams return safe defaults (empty arrays, { type: 'free' }, { connected: false }, no-op mutations). All 11 remote-api methods either return [] or throw 'local-only' error. 15+ consumer files unchanged — they see empty remote backend, which hides every Pro/Max/background-cloud-agent/remote-sandbox/1code.dev-API affordance (no data → no UI). Validation: tsc 116 errors (baseline 118, -2 fixed), bun build succeeded in 5m with 8GB heap. Side benefit: subscription check in agents-beta-tab returns { type: 'free' }, paid-plan gate stays closed in non-dev."
     },
     {
       "id": "US-008",
@@ -112,7 +112,7 @@
       ],
       "priority": 8,
       "passes": true,
-      "notes": "Commit 955e0a1. 23 files touched. rg -n '21st\\.dev|1code\\.dev|posthog|sentry|electron-updater|cdn\\.21st' on src/ + package.json + CONTRIBUTING.md returns 0 hits. README.md has 7 hits remaining \u2014 handled by US-010 (which rewrites the README as a local-first narrative). Other notable changes: author \u2192 Halotec/code@halotec.my.id in package.json; CSP in src/renderer/index.html drops posthog and 21st.dev from script-src and connect-src (security hardening); src/main/lib/config.ts getApiUrl() returns '' sentinel in packaged builds; src/main/windows/main.ts trusted origins \u2192 ['localhost','127.0.0.1']; src/main/index.ts Help menu Learn More \u2192 empty (no upstream project page); sidebar Automations button handleClick + agents-help-popover changelog/release handlers + update-banner handleOpenChangelog + use-just-updated openChangelog all stripped of openExternal remote URLs. Validation: tsc 116 errors (baseline 116, no regressions), 1 new error caught and fixed (missing getApiUrl import in chats.ts after switching to dynamic URL). Build skipped (5+ min; cosmetic-only changes outside type-checked paths)."
+      "notes": "Commit 955e0a1. 23 files touched. rg -n '21st\\.dev|1code\\.dev|posthog|sentry|electron-updater|cdn\\.21st' on src/ + package.json + CONTRIBUTING.md returns 0 hits. README.md has 7 hits remaining — handled by US-010 (which rewrites the README as a local-first narrative). Other notable changes: author → Halotec/code@halotec.my.id in package.json; CSP in src/renderer/index.html drops posthog and 21st.dev from script-src and connect-src (security hardening); src/main/lib/config.ts getApiUrl() returns '' sentinel in packaged builds; src/main/windows/main.ts trusted origins → ['localhost','127.0.0.1']; src/main/index.ts Help menu Learn More → empty (no upstream project page); sidebar Automations button handleClick + agents-help-popover changelog/release handlers + update-banner handleOpenChangelog + use-just-updated openChangelog all stripped of openExternal remote URLs. Validation: tsc 116 errors (baseline 116, no regressions), 1 new error caught and fixed (missing getApiUrl import in chats.ts after switching to dynamic URL). Build skipped (5+ min; cosmetic-only changes outside type-checked paths)."
     },
     {
       "id": "US-009",
@@ -125,7 +125,7 @@
       ],
       "priority": 9,
       "passes": true,
-      "notes": "Commit 5a7275d. Added @typescript/native-preview@7.0.0-dev.20260617.2 to devDependencies so the existing 'ts:check' script (which calls tsgo --noEmit) can resolve the binary. Validation: bun install \u2713 11s exit 0 (one benign peer-dep warning on zod 3.25.76); bun run ts:check \u2713 completes with 120 errors (baseline \u2014 all pre-existing, 0 introduced by US-001..US-008); bun run build \u2713 3m42s, produces out/ (NODE_OPTIONS=--max-old-space-size=8192 required to avoid sandbox OOM)."
+      "notes": "Commit 5a7275d. Added @typescript/native-preview@7.0.0-dev.20260617.2 to devDependencies so the existing 'ts:check' script (which calls tsgo --noEmit) can resolve the binary. Validation: bun install ✓ 11s exit 0 (one benign peer-dep warning on zod 3.25.76); bun run ts:check ✓ completes with 120 errors (baseline — all pre-existing, 0 introduced by US-001..US-008); bun run build ✓ 3m42s, produces out/ (NODE_OPTIONS=--max-old-space-size=8192 required to avoid sandbox OOM)."
     },
     {
       "id": "US-010",
@@ -137,11 +137,11 @@
       ],
       "priority": 10,
       "passes": true,
-      "notes": "Commit 2cfaecc. README rewritten as local-first narrative. New sections: What this fork does, Local-first / removed cloud features (table covering telemetry/Sentry/auto-update/cloud auth/Pro-Max subscription/background cloud agents/hosted API/hosted changelog), Where your data lives (macOS/Linux/Windows userData paths + SQLite note + no remote backup warning), Security notes (CSP, IPC origin validation, no real auth), Distribution (out-of-band internal package repo). Both ACs met: AC1 (Local-first section with all 8 removed features) \u2713, AC2 (data-storage path note) \u2713. Side effect on US-008: README rg sweep still returns 9 hits, all inside the required 'removed cloud features' table \u2014 intentional descriptive content per US-010 AC1, not references to live services."
+      "notes": "Commit 2cfaecc. README rewritten as local-first narrative. New sections: What this fork does, Local-first / removed cloud features (table covering telemetry/Sentry/auto-update/cloud auth/Pro-Max subscription/background cloud agents/hosted API/hosted changelog), Where your data lives (macOS/Linux/Windows userData paths + SQLite note + no remote backup warning), Security notes (CSP, IPC origin validation, no real auth), Distribution (out-of-band internal package repo). Both ACs met: AC1 (Local-first section with all 8 removed features) ✓, AC2 (data-storage path note) ✓. Side effect on US-008: README rg sweep still returns 9 hits, all inside the required 'removed cloud features' table — intentional descriptive content per US-010 AC1, not references to live services."
     },
     {
       "id": "US-011",
-      "title": "Rename internal package name 21st-desktop \u2192 halotec-code-desktop",
+      "title": "Rename internal package name 21st-desktop → halotec-code-desktop",
       "description": "As a Halotec operator, I want the npm package name to match the productName so build outputs and lockfile refer to halotec-code-desktop instead of the upstream name.",
       "acceptanceCriteria": [
         "package.json name = halotec-code-desktop",
@@ -165,7 +165,7 @@
       ],
       "priority": 2,
       "passes": true,
-      "notes": "npm install verified clean in sandbox (1098 \u2192 956 pkgs after --legacy-peer-deps). tsgo 120 errors = baseline."
+      "notes": "npm install verified clean in sandbox (1098 → 956 pkgs after --legacy-peer-deps). tsgo 120 errors = baseline."
     },
     {
       "id": "US-013",
@@ -183,7 +183,7 @@
     },
     {
       "id": "US-014",
-      "title": "Vite alias @shikijs/themes/ayu-light \u2192 ayu-dark",
+      "title": "Vite alias @shikijs/themes/ayu-light → ayu-dark",
       "description": "As a Halotec operator running electron-vite build, I want missing @shikijs/themes/ayu-light exports to fall back to ayu-dark so the renderer build completes.",
       "acceptanceCriteria": [
         "electron.vite.config.ts renderer.alias maps ayu-light to ayu-dark",
@@ -193,6 +193,97 @@
       "priority": 1,
       "passes": true,
       "notes": "Root cause: unknown transitive dep (likely @pierre/diffs or @git-diff-view) requests @shikijs/themes/ayu-light which has never existed in any @shikijs/themes version. No source-level or node_modules-level reference found via grep; appears to be Vite optimizeDeps dep-scan artifact."
+    },
+    {
+      "id": "US-015",
+      "title": "Sync prd-ralph.json US-001..005 passes=true with code reality",
+      "description": "prd-ralph.json was committed with US-001..005 still flagged as not passing, but the code and commits confirm all 14 stories are done. Sync the JSON.",
+      "acceptanceCriteria": [
+        "All Phase 1 stories in prd-ralph.json show passes=true"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Pure bookkeeping: US-001..005 code+commits verified, only the JSON flag was stale."
+    },
+    {
+      "id": "US-016",
+      "title": "customProviders Drizzle table",
+      "description": "Add a SQLite table for user-defined custom LLM providers (9router, OpenRouter, etc.) — name, type (anthropic|openai), baseUrl, encrypted apiKey, defaultModel, models JSON.",
+      "acceptanceCriteria": [
+        "customProviders table in schema/index.ts with id, name, type, baseUrl, apiKeyEncrypted, defaultModel, models (JSON text), createdAt, updatedAt",
+        "Type exports CustomProvider and NewCustomProvider",
+        "bun run db:generate (or equivalent) creates migration without error"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-017",
+      "title": "customProviders tRPC router (CRUD)",
+      "description": "Expose list / get / create / update / delete / testConnection procedures for custom providers. Encrypt apiKey on write, decrypt only at call sites in routers.",
+      "acceptanceCriteria": [
+        "customProvidersRouter mounted in routers/index.ts",
+        "list returns providers without decrypted key",
+        "create/update validates type ∈ {anthropic, openai} and baseUrl is URL",
+        "testConnection hits /v1/models and returns ok|error"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-018",
+      "title": "Custom Providers section in Preferences UI",
+      "description": "Add a Custom Providers panel: list of providers with Add/Edit/Delete, form with name, type dropdown (anthropic/openai), baseUrl, apiKey (password), defaultModel, multi-select models. Test connection button.",
+      "acceptanceCriteria": [
+        "New 'Custom Providers' item in sidebar between Plugins and MCP Servers (or as a section in Models tab)",
+        "Add/edit dialog with form fields + Test Connection button",
+        "On save, calls customProviders.create/update",
+        "Delete asks for confirmation"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-019",
+      "title": "Wire custom Anthropic provider into claude router",
+      "description": "When a custom anthropic provider is selected (per-chat or globally), use its baseUrl + apiKey + defaultModel instead of ANTHROPIC_BASE_URL/TOKEN env.",
+      "acceptanceCriteria": [
+        "claude router accepts customProviderId param",
+        "Resolves provider from DB, decrypts key, sets ANTHROPIC_BASE_URL + ANTHROPIC_AUTH_TOKEN + ANTHROPIC_MODEL from provider",
+        "Falls back to existing Override Model flow if no provider selected"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-020",
+      "title": "Wire custom OpenAI provider into codex router",
+      "description": "Pass OPENAI_BASE_URL and OPENAI_API_KEY env to the bundled Codex CLI subprocess when a custom openai provider is selected.",
+      "acceptanceCriteria": [
+        "codex router accepts customProviderId param",
+        "buildCodexProviderEnv adds OPENAI_BASE_URL and OPENAI_API_KEY when provider set",
+        "Codex subprocess reads custom endpoint for chat completions"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-021",
+      "title": "Dynamic model list from custom provider /v1/models",
+      "description": "After testConnection succeeds, fetch the provider's actual model list from /v1/models (Anthropic-style or OpenAI-style endpoint) so the user picks from real models, not guessing.",
+      "acceptanceCriteria": [
+        "testConnection response includes availableModels: string[]",
+        "UI populates models multi-select with fetched list",
+        "User can still type a custom model name not in the list"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
     }
   ]
 }
