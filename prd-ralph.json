@@ -352,6 +352,22 @@
       "priority": 1,
       "passes": true,
       "notes": "selectedCustomProviderIdByAgentAtom + GatewayPicker component + reads in IPCChatTransport (Claude) and ACPChatTransport (Codex). Picker renders only when usable.length > 0."
+    },
+    {
+      "id": "US-027",
+      "title": "Per-gateway model sub-picker in chat header",
+      "description": "Gateway picker (US-026) sets the endpoint but not the model. Add a two-tier popover: tier 1 lists gateways; drilling in shows tier 2 with the discovered model list (already cached in custom_providers.modelsJson from testConnection). When a gateway model is picked, the model string is passed verbatim in the chat subscription input instead of the bundled Codex/Claude default. Persists per (agent, gateway) so each gateway can have its own pinned model.",
+      "acceptanceCriteria": [
+        "Popover drill-in: clicking the chevron on a gateway shows its discovered models",
+        "Selecting a model persists per (agent, gateway) via selectedGatewayModelByAgentAtom",
+        "Codex subscription input uses gateway model when set (overrides bundled Codex dropdown)",
+        "Claude subscription input uses gateway model when set (overrides bundled Claude model)",
+        "Trigger button shows 'Gateway: <name> · <model>' when both are selected",
+        "Discovered models come from custom_providers.modelsJson (populated by testConnection)"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "selectedGatewayModelByAgentAtom + extended GatewayPicker (TopLevel + ModelLevel tiers) + gatewayModel override in ACPChatTransport and IPCChatTransport. Models loaded from customProviders.list query (already exposes models[]). Two-tier state managed via local useState(openTier)."
     }
   ]
 }

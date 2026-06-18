@@ -1166,3 +1166,21 @@ export const selectedCustomProviderIdByAgentAtom =
     undefined,
     { getOnInit: true },
   )
+
+// US-027: per-agent, per-gateway model override. When a gateway is
+// selected and the user picks one of its discovered models in the chat
+// header, the model string is passed verbatim in the chat subscription
+// input instead of (or alongside) the bundled Codex/Claude default.
+// Keyed { [agent]: { [gatewayId]: modelName | null } }; entries with
+// null mean "use the chat's default model selector".
+export const selectedGatewayModelByAgentAtom = atomWithStorage<
+  Record<
+    CustomProviderAgentId,
+    Record<string, string | null>
+  >
+>(
+  "agents:gatewayModelByAgent",
+  { "claude-code": {}, codex: {} },
+  undefined,
+  { getOnInit: true },
+)

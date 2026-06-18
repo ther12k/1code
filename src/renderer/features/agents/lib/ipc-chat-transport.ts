@@ -24,6 +24,7 @@ import {
   pendingAuthRetryMessageAtom,
   pendingUserQuestionsAtom,
   selectedCustomProviderIdByAgentAtom,
+  selectedGatewayModelByAgentAtom,
   subChatModelIdAtomFamily,
 } from "../atoms"
 import { useAgentSubChatStore } from "../stores/sub-chat-store"
@@ -173,6 +174,17 @@ export class IPCChatTransport implements ChatTransport<UIMessage> {
     const selectedModelId = appStore.get(subChatModelIdAtomFamily(this.config.subChatId))
     const modelString = MODEL_ID_MAP[selectedModelId] || MODEL_ID_MAP["opus"]
 
+    // US-027: per-gateway model override. If the user picked a model
+    // from the gateway's discovered list, send that exact string in
+    // the chat request instead of the bundled Claude model.
+    const claudeGatewayId = appStore.get(selectedCustomProviderIdByAgentAtom)["claude-code"]
+    const claudeGatewayModel = claudeGatewayId
+      ? (appStore.get(selectedGatewayModelByAgentAtom)["claude-code"]?.[
+          claudeGatewayId
+        ] as string | null | undefined) ?? null
+      : null
+    const effectiveModel = claudeGatewayModel ?? modelString
+
     const storedCustomConfig = appStore.get(
       customClaudeConfigAtom,
     ) as CustomClaudeConfig
@@ -209,7 +221,7 @@ export class IPCChatTransport implements ChatTransport<UIMessage> {
             mode: currentMode,
             sessionId,
             ...(maxThinkingTokens && { maxThinkingTokens }),
-            ...(modelString && { model: modelString }),
+            ...(effectiveModel && { model: effectiveModel }),
             ...(customConfig && { customConfig }),
             ...(() => {
               // US-026: route Claude through user-selected custom

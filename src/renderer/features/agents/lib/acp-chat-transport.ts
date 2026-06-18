@@ -14,6 +14,7 @@ import { trpcClient } from "../../../lib/trpc"
 import {
   pendingAuthRetryMessageAtom,
   selectedCustomProviderIdByAgentAtom,
+  selectedGatewayModelByAgentAtom,
   subChatCodexModelIdAtomFamily,
   subChatCodexThinkingAtomFamily,
 } from "../atoms"
@@ -159,6 +160,21 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
           sub?.unsubscribe()
         }
 
+        // US-027: per-gateway model override. When the user picked a
+        // model from the gateway's discovered list in the chat header,
+        // pass that exact model name in the subscription instead of the
+        // bundled Codex default. The codex CLI is told `--model <name>`
+        // verbatim — gateway is responsible for routing it.
+        const gatewayByAgent = appStore.get(
+          selectedCustomProviderIdByAgentAtom,
+        )
+        const gatewayId = gatewayByAgent.codex
+        const gatewayModel = gatewayId
+          ? (appStore.get(selectedGatewayModelByAgentAtom).codex?.[
+              gatewayId
+            ] as string | null | undefined) ?? null
+          : null
+
         sub = trpcClient.codex.chat.subscribe(
           {
             subChatId: this.config.subChatId,
@@ -169,7 +185,9 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
             ...(this.config.projectPath
               ? { projectPath: this.config.projectPath }
               : {}),
-            model: selectedModel,
+            // Gateway model takes precedence over the bundled Codex
+            // selector when both are set.
+            model: gatewayModel ?? selectedModel,
             mode: currentMode,
             ...(sessionId ? { sessionId } : {}),
             ...(forceNewSession ? { forceNewSession: true } : {}),
