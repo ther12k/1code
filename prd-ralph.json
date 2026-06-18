@@ -180,6 +180,19 @@
       "priority": 1,
       "passes": true,
       "notes": "package:linux now chains electron-vite build. Sandbox build of renderer hangs (2.5GB RAM insufficient for vite minify); user laptop with 8+ GB will succeed. tsgo baseline 120 errors unchanged."
+    },
+    {
+      "id": "US-014",
+      "title": "Vite alias @shikijs/themes/ayu-light \u2192 ayu-dark",
+      "description": "As a Halotec operator running electron-vite build, I want missing @shikijs/themes/ayu-light exports to fall back to ayu-dark so the renderer build completes.",
+      "acceptanceCriteria": [
+        "electron.vite.config.ts renderer.alias maps ayu-light to ayu-dark",
+        "electron-vite build completes renderer step",
+        "npm run package:linux still produces AppImage"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Root cause: unknown transitive dep (likely @pierre/diffs or @git-diff-view) requests @shikijs/themes/ayu-light which has never existed in any @shikijs/themes version. No source-level or node_modules-level reference found via grep; appears to be Vite optimizeDeps dep-scan artifact."
     }
   ]
 }

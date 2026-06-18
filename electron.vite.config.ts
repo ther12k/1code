@@ -61,6 +61,10 @@ export default defineConfig({
     resolve: {
       alias: {
         "@": resolve(__dirname, "src/renderer"),
+        // @shikijs/themes doesn't export ayu-light; some transitive dep
+        // (likely @pierre/diffs via git-diff-view) requests it. Alias to
+        // ayu-dark as a safe fallback so renderer build doesn't fail.
+        "@shikijs/themes/ayu-light": "@shikijs/themes/ayu-dark",
       },
     },
     build: {
