@@ -136,8 +136,8 @@
         "README notes where local data is stored (userData, ~/.halotec-code)"
       ],
       "priority": 10,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Commit 2cfaecc. README rewritten as local-first narrative. New sections: What this fork does, Local-first / removed cloud features (table covering telemetry/Sentry/auto-update/cloud auth/Pro-Max subscription/background cloud agents/hosted API/hosted changelog), Where your data lives (macOS/Linux/Windows userData paths + SQLite note + no remote backup warning), Security notes (CSP, IPC origin validation, no real auth), Distribution (out-of-band internal package repo). Both ACs met: AC1 (Local-first section with all 8 removed features) ✓, AC2 (data-storage path note) ✓. Side effect on US-008: README rg sweep still returns 9 hits, all inside the required 'removed cloud features' table — intentional descriptive content per US-010 AC1, not references to live services."
     }
   ]
 }
