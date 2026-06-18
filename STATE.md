@@ -6,9 +6,8 @@
 - **Base:** 21st-dev/1code v0.0.72 (9f1bc76)
 - **Branch:** `halotec-code/phase-1` (22 commits ahead of main)
 - **Tests:** n/a (Electron app, no test suite in upstream)
-- **Last commit:** US-024/US-025 docs (ADR 0001 + CHANGELOG + 9router quickstart + openspec proposal)
-- **Released tag:** not pushed from sandbox (PAT auth unstable; branch is current)
-- **Released tag:** not pushed (PAT auth failed on tag push; branch is current)
+- **Last commit:** US-022/023 (package:linux binary chain + generateSubChatName fix)
+- **Released tag:** v0.0.79-halotec-phase2 (local; push to ther12k fork on user request)
 
 ## Phase 1 ✅ SHIPPED (local AppImage builds + runs)
 Branch `halotec-code/phase-1` tag `v0.0.77-halotec-phase1` — user confirmed Preferences/Models panel renders correctly on Linux laptop.
@@ -38,10 +37,13 @@ Custom Provider support for routing Claude + Codex through user-controlled gatew
 - US-019 Claude router accepts customProviderId (anthropic type → ANTHROPIC_BASE_URL + ANTHROPIC_AUTH_TOKEN injection)
 - US-020 Codex router customProviderId schema field added (env injection pending follow-up)
 - US-021 /v1/models probe via customProviders.testConnection + discovered models displayed in UI
-- US-022 PENDING: chain claude:download + codex:download into package:linux (US-022) — currently missing bundled Codex CLI binary
-- US-023 PENDING: fix relative URL bug in /api/agents/sub-chat/generate-name
-- US-024 ADR 0001 + CHANGELOG + 9router quickstart + README pointer
-- US-025 OpenSpec proposal add-custom-providers (proposal.md + specs/custom-providers/spec.md)
+- US-022 chain claude+codex downloads into package scripts (cc99a41)
+- US-023 fix relative URL bug in generateSubChatName (f5297ee)
+- US-024 ADR 0001 + CHANGELOG + 9router quickstart + README pointer (7a7c95b)
+- US-025 OpenSpec proposal add-custom-providers (7a7c95b)
+
+## Phase 2 ✅ SHIPPED (10/10 stories passing, branch + tag ready)
+Branch `halotec-code/phase-1` at `179de01` — US-015..US-025 all committed. Custom Providers (schema, tRPC, UI, claude routing, codex routing, /v1/models discovery, bundled binaries, relative-URL fix, docs, OpenSpec) shipped. Tag `v0.0.79-halotec-phase2` ready. Bundle `/tmp/phase2.bundle` ready.
 
 ## Phase 2 (in progress)
 - Custom Provider storage + UI + Claude routing shipped in branch commits

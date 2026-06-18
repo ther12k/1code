@@ -215,8 +215,8 @@
         "bun run db:generate (or equivalent) creates migration without error"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Iteration 3 (2026-06-18): drizzle/0008_custom_providers.sql + 0008_snapshot.json + journal entry + src/main/lib/db/schema/index.ts add customProviders table (id, name, type anthropic|openai, baseUrl, apiKeyEncrypted, defaultModel, modelsJson, enabled, timestamps). Type exports CustomProvider + NewCustomProvider. drizzle-kit generated migration included."
     },
     {
       "id": "US-017",
@@ -229,8 +229,8 @@
         "testConnection hits /v1/models and returns ok|error"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Iteration 3 (2026-06-18): src/main/lib/trpc/routers/custom-providers.ts (248 lines) — list/get/create/update/delete/testConnection procedures. Keys encrypted via Electron safeStorage (only hasApiKey flag returned to renderer). testConnection probes /v1/models with both x-api-key and Authorization headers, supports OpenAI and Anthropic response shapes, persists discovered models. resolveCustomProvider helper exported for US-019/US-020 routers."
     },
     {
       "id": "US-018",
@@ -243,8 +243,8 @@
         "Delete asks for confirmation"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Iteration 3 (2026-06-18): src/renderer/features/settings/components/dialogs/settings-tabs/agents-custom-providers-tab.tsx (361 lines) — sidebar entry between Models and Skills. Add form (name/protocol/baseUrl/apiKey/defaultModel), Test button (calls testConnection), Delete with confirm dialog, expandable discovered-models disclosure. Wired into SettingsTab union, settings-sidebar, settings-content, atoms index."
     },
     {
       "id": "US-019",
@@ -256,8 +256,8 @@
         "Falls back to existing Override Model flow if no provider selected"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Iteration 3 (2026-06-18): src/main/lib/trpc/routers/claude.ts — chat subscription accepts optional customProviderId input. resolveCustomProvider() decrypts apiKey + reads baseUrl, synthesises customConfig compatible with existing buildClaudeEnv path. Injects ANTHROPIC_BASE_URL + ANTHROPIC_AUTH_TOKEN. Precedence: offline > customProvider > explicit customConfig. Type guard: only type=anthropic providers used; mismatched providers emit a warning to the chat stream."
     },
     {
       "id": "US-020",
@@ -322,8 +322,8 @@
         "README links to ADR + CHANGELOG"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Iteration 3 (2026-06-18): docs/adr/0001-custom-providers.md (Context, Decision, Consequences, Alternatives, Verification). CHANGELOG.md v0.0.79-halotec-phase2 entry. docs/9router-quickstart.md. README pointer."
     },
     {
       "id": "US-025",
@@ -334,8 +334,8 @@
         "specs/custom-providers/spec.md with ADDED Requirements for the new capability"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Iteration 3 (2026-06-18): openspec/changes/add-custom-providers/proposal.md + openspec/changes/add-custom-providers/specs/custom-providers/spec.md (ADDED Requirements: schema, CRUD, claude routing, codex routing, UI, encryption, /v1/models discovery)."
     }
   ]
 }
