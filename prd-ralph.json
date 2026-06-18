@@ -368,6 +368,20 @@
       "priority": 1,
       "passes": true,
       "notes": "selectedGatewayModelByAgentAtom + extended GatewayPicker (TopLevel + ModelLevel tiers) + gatewayModel override in ACPChatTransport and IPCChatTransport. Models loaded from customProviders.list query (already exposes models[]). Two-tier state managed via local useState(openTier)."
+    },
+    {
+      "id": "US-028",
+      "title": "Mount GatewayPicker in active-chat header",
+      "description": "US-026 mounted the GatewayPicker in the new-chat form header. Once a chat is opened, ActiveChat renders its own header (no model selector, no gateway picker). Without this, users can set the gateway on a new chat but cannot see or change it mid-conversation. Mount the picker in the active chat desktop header, inferring the agent type from the active sub-chat.",
+      "acceptanceCriteria": [
+        "GatewayPicker visible in active chat desktop header (between AgentsHeaderControls and SubChatSelector)",
+        "Picks the right agent type via inferProviderFromMessages(activeSubChatId)",
+        "Auto-hides if no compatible providers configured (existing GatewayPicker behavior)",
+        "Mobile chat header is unchanged (too cramped; out of scope for this story)"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "active-chat.tsx: imported GatewayPicker, mounted in desktop header section using inferProviderFromMessages(activeSubChatId) for agentId prop. Reuses the per-agent atom so selection persists across new-chat form and active chat."
     }
   ]
 }

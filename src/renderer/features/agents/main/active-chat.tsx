@@ -155,6 +155,7 @@ import {
 } from "../atoms"
 import { BUILTIN_SLASH_COMMANDS } from "../commands"
 import { AgentSendButton } from "../components/agent-send-button"
+import { GatewayPicker } from "../components/gateway-picker"
 import { OpenLocallyDialog } from "../components/open-locally-dialog"
 import { PreviewSetupHoverCard } from "../components/preview-setup-hover-card"
 import type { TextSelectionSource } from "../context/text-selection-context"
@@ -7497,6 +7498,15 @@ Make sure to preserve all functionality from both branches when resolving confli
                         isSubChatsSidebarOpen={
                           subChatsSidebarMode === "sidebar"
                         }
+                      />
+                      {/* US-028: per-agent gateway picker in the active
+                          chat header. Reads the active sub-chat's
+                          inferred provider so it lists only compatible
+                          gateways. Auto-hides when none configured. */}
+                      <GatewayPicker
+                        agentId={inferProviderFromMessages(
+                          activeSubChatId || undefined,
+                        )}
                       />
                       <SubChatSelector
                         onCreateNew={handleCreateNewSubChat}
