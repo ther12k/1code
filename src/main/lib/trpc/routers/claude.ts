@@ -43,6 +43,7 @@ import { fetchOAuthMetadata, getMcpBaseUrl } from "../../oauth"
 import { discoverPluginMcpServers } from "../../plugins"
 import { publicProcedure, router } from "../index"
 import { buildAgentsOption } from "./agent-utils"
+import { resolveCustomProvider } from "./custom-providers"
 import {
   getApprovedPluginMcpServers,
   getEnabledPlugins,
@@ -810,6 +811,9 @@ export const claudeRouter = router({
             baseUrl: z.string().min(1),
           })
           .optional(),
+        // US-019: when set, resolves a custom Anthropic-compatible provider
+        // from the custom_providers table and uses its baseUrl + apiKey.
+        customProviderId: z.string().optional(),
         maxThinkingTokens: z.number().optional(), // Enable extended thinking
         images: z.array(imageAttachmentSchema).optional(), // Image attachments
         historyEnabled: z.boolean().optional(),
@@ -997,8 +1001,31 @@ export const claudeRouter = router({
               return
             }
 
-            // Use offline config if available
-            const finalCustomConfig = offlineResult.config || input.customConfig
+            // Resolve custom provider (US-019) if specified
+            let customProviderConfig: { model: string; token: string; baseUrl: string } | null = null
+            if (input.customProviderId) {
+              const provider = await resolveCustomProvider(input.customProviderId)
+              if (provider && provider.type === "anthropic") {
+                // Reuse the existing customConfig shape so downstream code
+                // (env injection, connection-method reporting) stays unchanged.
+                customProviderConfig = {
+                  model: input.model || provider.defaultModel || "",
+                  token: provider.apiKey,
+                  baseUrl: provider.baseUrl,
+                }
+              } else if (provider && provider.type !== "anthropic") {
+                safeEmit({
+                  type: "data",
+                  data: `[custom-providers] Provider "${provider.name}" is type=${provider.type}, not anthropic; ignoring for Claude.`,
+                } as UIMessageChunk)
+              }
+            }
+
+            // Use offline config if available, then custom provider, then explicit customConfig
+            const finalCustomConfig =
+              offlineResult.config ||
+              customProviderConfig ||
+              input.customConfig
             const isUsingOllama = offlineResult.isUsingOllama
 
             // Track connection method for analytics
