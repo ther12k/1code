@@ -269,8 +269,8 @@
         "Codex subprocess reads custom endpoint for chat completions"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in src/main/lib/trpc/routers/codex.ts: resolveCustomProviderEnv merges OPENAI_BASE_URL+OPENAI_API_KEY for openai-type providers; getCustomProviderFingerprint invalidates cached ACP session; getOrCreateProvider accepts customProviderEnv/customProviderFingerprint; subscription handler resolves+passes through. Anthropic-type providers ignored. Missing/disabled provider is no-op."
     },
     {
       "id": "US-021",
@@ -280,6 +280,58 @@
         "testConnection response includes availableModels: string[]",
         "UI populates models multi-select with fetched list",
         "User can still type a custom model name not in the list"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "probeProvider helper implemented in US-017 (custom-providers.ts); UI displays discovered models under 'known models' disclosure in AgentsCustomProvidersTab."
+    },
+    {
+      "id": "US-022",
+      "title": "Bundle claude+codex binaries in package:linux (fix missing binary)",
+      "description": "package:linux currently relies on resources/bin/${platform}-${arch} but the download scripts (download-claude-binary.mjs, download-codex-binary.mjs) are NOT chained. On a fresh clone, package:linux produces an AppImage whose resources/bin is empty and Codex crashes with 'Bundled Codex CLI not found'. Wire claude:download + codex:download into package scripts so the build is reproducible from a clean checkout.",
+      "acceptanceCriteria": [
+        "package:linux runs claude:download + codex:download before electron-builder",
+        "After a clean clone + npm install + npm run package:linux, the resulting AppImage's resources/bin contains a codex binary",
+        "VERSION file present in resources/bin after build",
+        "No-op when binaries already present (idempotent)"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-023",
+      "title": "Fix relative URL bug in /api/agents/sub-chat/generate-name",
+      "description": "On startup the agent sub-chat name generator calls fetch('/api/agents/sub-chat/generate-name') with a relative URL. Node's undici rejects it with 'Invalid URL'. Pass an absolute URL or use the IPC channel instead.",
+      "acceptanceCriteria": [
+        "generateSubChatName procedure does not throw ERR_INVALID_URL",
+        "Sub-chat names generated on first message"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-024",
+      "title": "Document Custom Providers (ADR + CHANGELOG + 9router quickstart)",
+      "description": "Write the decision record (ADR), changelog entry, and a 9router quickstart so future maintainers understand why this feature exists, what it does, and how to configure it.",
+      "acceptanceCriteria": [
+        "docs/adr/0001-custom-providers.md follows ADR template (Context / Decision / Consequences)",
+        "CHANGELOG.md at repo root with v0.0.78 (Phase 1) and v0.0.79 (Phase 2) entries",
+        "docs/9router-quickstart.md with the exact 9router.halotec.my.id/v1 endpoint config",
+        "README links to ADR + CHANGELOG"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-025",
+      "title": "OpenSpec proposal for add-custom-providers",
+      "description": "Per openspec/AGENTS.md, feature changes require a proposal.md in openspec/changes/<id>/. Create one for the Custom Providers feature so future spec deltas have a baseline.",
+      "acceptanceCriteria": [
+        "openspec/changes/add-custom-providers/proposal.md created with Why / What Changes / Impact sections",
+        "specs/custom-providers/spec.md with ADDED Requirements for the new capability"
       ],
       "priority": 2,
       "passes": false,

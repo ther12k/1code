@@ -22,6 +22,7 @@ import {
   fetchMcpToolsStdio,
   type McpToolInfo,
 } from "../../mcp-auth"
+import { resolveCustomProvider } from "./custom-providers"
 import { publicProcedure, router } from "../index"
 
 const imageAttachmentSchema = z.object({
@@ -35,6 +36,12 @@ type CodexProviderSession = {
   cwd: string
   authFingerprint: string | null
   mcpFingerprint: string
+  /**
+   * US-020: sha256 of (customProviderId|baseUrl|apiKey). Used to invalidate
+   * the cached ACP provider when the user switches gateway in Preferences.
+   * "none" when no custom provider is in use.
+   */
+  customProviderFingerprint: string
 }
 
 type CodexLoginSessionState =
@@ -1117,7 +1124,17 @@ function getAuthFingerprint(authConfig?: { apiKey: string }): string | null {
   return createHash("sha256").update(apiKey).digest("hex")
 }
 
-function buildCodexProviderEnv(authConfig?: { apiKey: string }): Record<string, string> {
+function buildCodexProviderEnv(params: {
+  authConfig?: { apiKey: string }
+  /**
+   * US-020: When set, resolves a custom OpenAI-compatible provider from the
+   * custom_providers table and merges OPENAI_BASE_URL + OPENAI_API_KEY into
+   * the subprocess env so the bundled codex CLI talks to the user's gateway
+   * (9router, OpenRouter, LiteLLM, etc.) instead of api.openai.com.
+   * Anthropic-type providers are ignored (codex is OpenAI-compatible only).
+   */
+  customProviderId?: string
+}): Record<string, string> {
   // Prefer shell-derived values (notably PATH) so stdio MCP dependencies
   // like pipx/npx resolve the same way as in MCP tool probing.
   const env: Record<string, string> = {}
@@ -1135,7 +1152,7 @@ function buildCodexProviderEnv(authConfig?: { apiKey: string }): Record<string, 
     }
   }
 
-  const apiKey = authConfig?.apiKey?.trim()
+  const apiKey = params.authConfig?.apiKey?.trim()
   if (!apiKey) {
     return env
   }
@@ -1144,6 +1161,25 @@ function buildCodexProviderEnv(authConfig?: { apiKey: string }): Record<string, 
     ...env,
     CODEX_API_KEY: apiKey,
   }
+}
+
+/**
+ * US-020: Resolve custom OpenAI-compatible provider into env overrides.
+ * Called from the subscription handler so the env is fresh per run.
+ */
+async function resolveCustomProviderEnv(
+  customProviderId: string | undefined,
+): Promise<Record<string, string>> {
+  if (!customProviderId) return {}
+  const provider = await resolveCustomProvider(customProviderId)
+  if (!provider) return {}
+  if (provider.type !== "openai") return {}
+  const trimmed = provider.baseUrl.replace(/\/+$/, "")
+  const overrides: Record<string, string> = {
+    OPENAI_BASE_URL: trimmed,
+    OPENAI_API_KEY: provider.apiKey,
+  }
+  return overrides
 }
 
 function getCodexAuthMethodId(authConfig?: {
@@ -1218,6 +1254,18 @@ function buildModelMessageContent(
   return content
 }
 
+function getCustomProviderFingerprint(
+  customProviderId: string | undefined,
+  customProviderEnv: Record<string, string>,
+): string {
+  if (!customProviderId) return "none"
+  const baseUrl = customProviderEnv.OPENAI_BASE_URL ?? ""
+  const apiKey = customProviderEnv.OPENAI_API_KEY ?? ""
+  return createHash("sha256")
+    .update(`${customProviderId}|${baseUrl}|${apiKey}`)
+    .digest("hex")
+}
+
 function getOrCreateProvider(params: {
   subChatId: string
   cwd: string
@@ -1227,15 +1275,24 @@ function getOrCreateProvider(params: {
   authConfig?: {
     apiKey: string
   }
+  /**
+   * US-020: When set, OPENAI_BASE_URL + OPENAI_API_KEY overrides to merge
+   * into the codex subprocess env. Computed once by the caller via
+   * resolveCustomProviderEnv so we stay synchronous.
+   */
+  customProviderEnv?: Record<string, string>
+  customProviderFingerprint?: string
 }): ACPProvider {
   const authFingerprint = getAuthFingerprint(params.authConfig)
+  const customFingerprint = params.customProviderFingerprint ?? "none"
   const existing = providerSessions.get(params.subChatId)
 
   if (
     existing &&
     existing.cwd === params.cwd &&
     existing.authFingerprint === authFingerprint &&
-    existing.mcpFingerprint === params.mcpFingerprint
+    existing.mcpFingerprint === params.mcpFingerprint &&
+    existing.customProviderFingerprint === customFingerprint
   ) {
     return existing.provider
   }
@@ -1252,9 +1309,17 @@ function getOrCreateProvider(params: {
     ? undefined
     : params.existingSessionId
 
+  const baseEnv = buildCodexProviderEnv({
+    authConfig: params.authConfig,
+  })
+  const mergedEnv = {
+    ...baseEnv,
+    ...(params.customProviderEnv ?? {}),
+  }
+
   const provider = createACPProvider({
     command: resolveCodexAcpBinaryPath(),
-    env: buildCodexProviderEnv(params.authConfig),
+    env: mergedEnv,
     authMethodId: getCodexAuthMethodId(params.authConfig),
     session: {
       cwd: params.cwd,
@@ -1271,6 +1336,7 @@ function getOrCreateProvider(params: {
     cwd: params.cwd,
     authFingerprint,
     mcpFingerprint: params.mcpFingerprint,
+    customProviderFingerprint: customFingerprint,
   })
 
   return provider
@@ -1574,6 +1640,11 @@ export const codexRouter = router({
             apiKey: z.string().min(1),
           })
           .optional(),
+        // US-020: when set, resolves a custom OpenAI-compatible provider
+        // from the custom_providers table. Sets OPENAI_BASE_URL + OPENAI_API_KEY
+        // in the codex subprocess env so the bundled codex CLI talks to the
+        // user's gateway (9router, OpenRouter, LiteLLM, etc.) instead of api.openai.com.
+        customProviderId: z.string().optional(),
       }),
     )
     .subscription(({ input }) => {
@@ -1728,6 +1799,14 @@ export const codexRouter = router({
               console.error("[codex] Failed to resolve MCP servers:", mcpError)
             }
 
+            const customProviderEnv = await resolveCustomProviderEnv(
+              input.customProviderId,
+            )
+            const customProviderFingerprint = getCustomProviderFingerprint(
+              input.customProviderId,
+              customProviderEnv,
+            )
+
             const provider = getOrCreateProvider({
               subChatId: input.subChatId,
               cwd: input.cwd,
@@ -1738,6 +1817,8 @@ export const codexRouter = router({
                   ? undefined
                   : input.sessionId ?? getLastSessionId(existingMessages),
               authConfig: input.authConfig,
+              customProviderEnv,
+              customProviderFingerprint,
             })
 
             const startedAt = Date.now()
