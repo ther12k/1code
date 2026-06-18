@@ -1153,3 +1153,16 @@ export const fileViewerOpenAtomFamily = atomFamily((chatId: string) =>
     },
   ),
 )
+
+// US-026: per-agent selection of a custom provider id (from
+// custom_providers table) for routing chat runs through user-controlled
+// LLM gateways (9router, OpenRouter, LiteLLM, etc.). null = use default
+// upstream. Per-agent because Claude and Codex have separate provider pools.
+export type CustomProviderAgentId = "claude-code" | "codex"
+export const selectedCustomProviderIdByAgentAtom =
+  atomWithStorage<Record<CustomProviderAgentId, string | null>>(
+    "agents:customProviderByAgent",
+    { "claude-code": null, codex: null },
+    undefined,
+    { getOnInit: true },
+  )

@@ -2,7 +2,7 @@
   "project": "Halotec Code (fork of 21st-dev/1code)",
   "branchName": "halotec-code/phase-1",
   "baseRef": "v0.0.75 (c9624bf)",
-  "description": "Phase 2: Custom Provider support (Anthropic + OpenAI compatible) for routing Claude/Codex through user-controlled gateways like 9router.",
+  "description": "Phase 2: Custom Provider support + chat UI integration. Routes Claude/Codex through user-controlled LLM gateways (9router, OpenRouter, LiteLLM) via Preferences tab storage + per-chat Gateway picker.",
   "userStories": [
     {
       "id": "US-001",
@@ -336,6 +336,22 @@
       "priority": 2,
       "passes": true,
       "notes": "Iteration 3 (2026-06-18): openspec/changes/add-custom-providers/proposal.md + openspec/changes/add-custom-providers/specs/custom-providers/spec.md (ADDED Requirements: schema, CRUD, claude routing, codex routing, UI, encryption, /v1/models discovery)."
+    },
+    {
+      "id": "US-026",
+      "title": "Chat-header Gateway picker (customProviderId in transports)",
+      "description": "Backend (US-019/020) accepts customProviderId but the chat UI never sends it from the user-facing controls. Add a small 'Gateway: Default | 9router | ...' picker next to the model selector. Reads/writes selectedCustomProviderIdByAgentAtom (per-agent persisted). Both Claude (IPCChatTransport) and Codex (ACPChatTransport) read the atom on each send and include customProviderId in the subscription input. Picker only renders when at least one compatible provider is configured, so the header stays clean for users who don't use gateways.",
+      "acceptanceCriteria": [
+        "Gateway picker visible in new-chat header next to model selector",
+        "Picker lists only enabled providers matching the current agent type (anthropic for claude-code, openai for codex)",
+        "Selecting a provider persists per-agent across restarts (atomWithStorage)",
+        "Claude subscription input includes customProviderId when set",
+        "Codex subscription input includes customProviderId when set",
+        "Picker is hidden when no compatible providers exist"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "selectedCustomProviderIdByAgentAtom + GatewayPicker component + reads in IPCChatTransport (Claude) and ACPChatTransport (Codex). Picker renders only when usable.length > 0."
     }
   ]
 }

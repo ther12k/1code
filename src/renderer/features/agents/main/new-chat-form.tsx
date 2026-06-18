@@ -107,6 +107,7 @@ import {
 import { agentsSidebarOpenAtom, agentsUnseenChangesAtom } from "../atoms"
 import { AgentSendButton } from "../components/agent-send-button"
 import { AgentModelSelector } from "../components/agent-model-selector"
+import { GatewayPicker } from "../components/gateway-picker"
 import { CreateBranchDialog } from "../components/create-branch-dialog"
 import { formatTimeAgo } from "../utils/format-time-ago"
 import { handlePasteEvent } from "../utils/paste-text"
@@ -1931,6 +1932,16 @@ export function NewChatForm({
                           }}
                         />
                       </div>
+                      {/* US-026: per-agent gateway picker. Renders only when
+                          the user has configured a compatible custom provider
+                          in Preferences → Custom Providers. */}
+                      <GatewayPicker
+                        agentId={
+                          selectedAgent.id === "codex"
+                            ? "codex"
+                            : "claude-code"
+                        }
+                      />
                     </div>
 
                     <div className="flex items-center gap-0.5 ml-auto flex-shrink-0">

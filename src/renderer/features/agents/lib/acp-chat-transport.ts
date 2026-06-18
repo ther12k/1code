@@ -13,6 +13,7 @@ import { appStore } from "../../../lib/jotai-store"
 import { trpcClient } from "../../../lib/trpc"
 import {
   pendingAuthRetryMessageAtom,
+  selectedCustomProviderIdByAgentAtom,
   subChatCodexModelIdAtomFamily,
   subChatCodexThinkingAtomFamily,
 } from "../atoms"
@@ -180,6 +181,17 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
                   },
                 }
               : {}),
+            ...(() => {
+              // US-026: route Codex through user-selected custom OpenAI
+              // provider from the chat header Gateway picker. Reads the
+              // per-agent atom so each sub-chat can target a different
+              // gateway if the user toggles mid-session.
+              const byAgent = appStore.get(
+                selectedCustomProviderIdByAgentAtom,
+              )
+              const id = byAgent.codex
+              return id ? { customProviderId: id } : {}
+            })(),
           },
           {
             onData: (chunk: UIMessageChunk) => {

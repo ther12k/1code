@@ -23,6 +23,7 @@ import {
   MODEL_ID_MAP,
   pendingAuthRetryMessageAtom,
   pendingUserQuestionsAtom,
+  selectedCustomProviderIdByAgentAtom,
   subChatModelIdAtomFamily,
 } from "../atoms"
 import { useAgentSubChatStore } from "../stores/sub-chat-store"
@@ -210,6 +211,17 @@ export class IPCChatTransport implements ChatTransport<UIMessage> {
             ...(maxThinkingTokens && { maxThinkingTokens }),
             ...(modelString && { model: modelString }),
             ...(customConfig && { customConfig }),
+            ...(() => {
+              // US-026: route Claude through user-selected custom
+              // Anthropic provider from the chat header Gateway picker.
+              // Read per-agent so each sub-chat can target a different
+              // gateway if the user toggles mid-session.
+              const byAgent = appStore.get(
+                selectedCustomProviderIdByAgentAtom,
+              )
+              const id = byAgent["claude-code"]
+              return id ? { customProviderId: id } : {}
+            })(),
             ...(selectedOllamaModel && { selectedOllamaModel }),
             historyEnabled,
             offlineModeEnabled,
