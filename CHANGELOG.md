@@ -22,9 +22,12 @@ fork.
   Claude chat subscription decrypts the stored API key and injects
   `ANTHROPIC_BASE_URL` + `ANTHROPIC_AUTH_TOKEN` into the SDK env.
   Precedence: `offline > customProvider > customConfig`.
-- **Codex custom-provider schema** — `customProviderId` input added to
-  the Codex chat subscription. Env-var injection
-  (`OPENAI_BASE_URL` + `OPENAI_API_KEY`) follows in the next release.
+- **Codex custom-provider routing** — `customProviderId` input on the
+  Codex chat subscription decrypts the stored API key and injects
+  `OPENAI_BASE_URL` + `OPENAI_API_KEY` into the codex subprocess env.
+  Provider switch invalidates the cached ACP session via
+  `customProviderFingerprint` (sha256 of providerId|baseUrl|apiKey).
+  Anthropic-type providers are ignored (codex is OpenAI-compatible only).
 - **Preferences → Custom Providers** tab — Add form, list with Test
   button, Delete with confirm, expandable discovered-model disclosure.
 - **API key encryption** — keys are stored with Electron `safeStorage`,
@@ -34,16 +37,21 @@ fork.
 - **ADR 0001** — `docs/adr/0001-custom-providers.md` documents Context,
   Decision, Consequences, Alternatives, and Verification steps.
 
+### Fixed
+- **`package:linux` / `package:mac` / `package:win` / `package`** now
+  chain `download-claude-binary.mjs` + `download-codex-binary.mjs`
+  before `electron-builder`. Both scripts are idempotent (sha256 check
+  + skip if binary present with correct hash). Fixes "Bundled Codex CLI
+  not found" on fresh-clone builds — `resources/bin/` is now populated
+  on first build.
+- **`generateSubChatName`** short-circuits when `getApiUrl()` returns
+  empty (packaged local-first builds). Previously did
+  `fetch("${apiUrl}/api/...")` → relative URL → undici `ERR_INVALID_URL`.
+  Now falls through to `getFallbackName()` directly.
+
 ### Verified
 - 9router endpoint `https://9router.halotec.my.id/v1` returns HTTP 401
-  without auth and HTTP 200 with a valid `Authorization: Bearer ***  header, confirming both OpenAI- and Anthropic-compatible routing.
-
-### Known issues (filed for next phase)
-- `package:linux` does not chain the `claude:download` / `codex:download`
-  scripts; the bundled Codex CLI binary is missing from the AppImage
-  (`resources/bin/${platform}-${arch}`). Tracked as US-022.
-- Sub-chat name generator throws `ERR_INVALID_URL` on first message
-  because of a relative fetch URL. Tracked as US-023.
+  without auth and HTTP 200 with a valid `Authorization: Bearer ***` header, confirming both OpenAI- and Anthropic-compatible routing.
 
 ---
 
