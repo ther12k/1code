@@ -61,15 +61,18 @@ export default defineConfig({
     resolve: {
       alias: [
         { find: "@", replacement: resolve(__dirname, "src/renderer") },
-        // @shikijs/themes doesn't export ayu-light; some transitive dep
-        // (likely @pierre/diffs via git-diff-view) requests it. Alias to
-        // ayu-dark as a safe fallback so renderer build doesn't fail.
-        // Also excluded from optimizeDeps below so Vite's prebundle doesn't
-        // try to resolve the missing export before the alias kicks in.
-        { find: /^@shikijs\/themes\/ayu-light$/, replacement: "@shikijs/themes/ayu-dark" },
+        // @shikijs/themes only ships one ayu variant (ayu-dark). Transitive
+        // deps may request 'ayu-light', 'ayu-mirage', or any other theme
+        // not in this package. Map any missing subpath to ayu-dark so the
+        // build never fails on a missing theme specifier.
+        {
+          find: /^@shikijs\/themes\/.+/,
+          replacement: "@shikijs/themes/ayu-dark",
+        },
       ],
     },
     optimizeDeps: {
+      // Skip prebundling — alias above handles subpath requests.
       exclude: ["@shikijs/themes"],
     },
     build: {
