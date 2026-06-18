@@ -101,7 +101,7 @@
       ],
       "priority": 7,
       "passes": true,
-      "notes": "Commit 7c0a563. remote-trpc.ts and remote-api.ts rewritten as no-op stubs. All 21 tRPC methods across agents/automations/github/linear/teams return safe defaults (empty arrays, { type: 'free' }, { connected: false }, no-op mutations). All 11 remote-api methods either return [] or throw 'local-only' error. 15+ consumer files unchanged — they see empty remote backend, which hides every Pro/Max/background-cloud-agent/remote-sandbox/1code.dev-API affordance (no data → no UI). Validation: tsc 116 errors (baseline 118, -2 fixed), bun build succeeded in 5m with 8GB heap. Side benefit: subscription check in agents-beta-tab returns { type: 'free' }, paid-plan gate stays closed in non-dev."
+      "notes": "Commit 7c0a563. remote-trpc.ts and remote-api.ts rewritten as no-op stubs. All 21 tRPC methods across agents/automations/github/linear/teams return safe defaults (empty arrays, { type: 'free' }, { connected: false }, no-op mutations). All 11 remote-api methods either return [] or throw 'local-only' error. 15+ consumer files unchanged \u2014 they see empty remote backend, which hides every Pro/Max/background-cloud-agent/remote-sandbox/1code.dev-API affordance (no data \u2192 no UI). Validation: tsc 116 errors (baseline 118, -2 fixed), bun build succeeded in 5m with 8GB heap. Side benefit: subscription check in agents-beta-tab returns { type: 'free' }, paid-plan gate stays closed in non-dev."
     },
     {
       "id": "US-008",
@@ -112,7 +112,7 @@
       ],
       "priority": 8,
       "passes": true,
-      "notes": "Commit 955e0a1. 23 files touched. rg -n '21st\\.dev|1code\\.dev|posthog|sentry|electron-updater|cdn\\.21st' on src/ + package.json + CONTRIBUTING.md returns 0 hits. README.md has 7 hits remaining — handled by US-010 (which rewrites the README as a local-first narrative). Other notable changes: author → Halotec/code@halotec.my.id in package.json; CSP in src/renderer/index.html drops posthog and 21st.dev from script-src and connect-src (security hardening); src/main/lib/config.ts getApiUrl() returns '' sentinel in packaged builds; src/main/windows/main.ts trusted origins → ['localhost','127.0.0.1']; src/main/index.ts Help menu Learn More → empty (no upstream project page); sidebar Automations button handleClick + agents-help-popover changelog/release handlers + update-banner handleOpenChangelog + use-just-updated openChangelog all stripped of openExternal remote URLs. Validation: tsc 116 errors (baseline 116, no regressions), 1 new error caught and fixed (missing getApiUrl import in chats.ts after switching to dynamic URL). Build skipped (5+ min; cosmetic-only changes outside type-checked paths)."
+      "notes": "Commit 955e0a1. 23 files touched. rg -n '21st\\.dev|1code\\.dev|posthog|sentry|electron-updater|cdn\\.21st' on src/ + package.json + CONTRIBUTING.md returns 0 hits. README.md has 7 hits remaining \u2014 handled by US-010 (which rewrites the README as a local-first narrative). Other notable changes: author \u2192 Halotec/code@halotec.my.id in package.json; CSP in src/renderer/index.html drops posthog and 21st.dev from script-src and connect-src (security hardening); src/main/lib/config.ts getApiUrl() returns '' sentinel in packaged builds; src/main/windows/main.ts trusted origins \u2192 ['localhost','127.0.0.1']; src/main/index.ts Help menu Learn More \u2192 empty (no upstream project page); sidebar Automations button handleClick + agents-help-popover changelog/release handlers + update-banner handleOpenChangelog + use-just-updated openChangelog all stripped of openExternal remote URLs. Validation: tsc 116 errors (baseline 116, no regressions), 1 new error caught and fixed (missing getApiUrl import in chats.ts after switching to dynamic URL). Build skipped (5+ min; cosmetic-only changes outside type-checked paths)."
     },
     {
       "id": "US-009",
@@ -125,7 +125,7 @@
       ],
       "priority": 9,
       "passes": true,
-      "notes": "Commit 5a7275d. Added @typescript/native-preview@7.0.0-dev.20260617.2 to devDependencies so the existing 'ts:check' script (which calls tsgo --noEmit) can resolve the binary. Validation: bun install ✓ 11s exit 0 (one benign peer-dep warning on zod 3.25.76); bun run ts:check ✓ completes with 120 errors (baseline — all pre-existing, 0 introduced by US-001..US-008); bun run build ✓ 3m42s, produces out/ (NODE_OPTIONS=--max-old-space-size=8192 required to avoid sandbox OOM)."
+      "notes": "Commit 5a7275d. Added @typescript/native-preview@7.0.0-dev.20260617.2 to devDependencies so the existing 'ts:check' script (which calls tsgo --noEmit) can resolve the binary. Validation: bun install \u2713 11s exit 0 (one benign peer-dep warning on zod 3.25.76); bun run ts:check \u2713 completes with 120 errors (baseline \u2014 all pre-existing, 0 introduced by US-001..US-008); bun run build \u2713 3m42s, produces out/ (NODE_OPTIONS=--max-old-space-size=8192 required to avoid sandbox OOM)."
     },
     {
       "id": "US-010",
@@ -137,7 +137,21 @@
       ],
       "priority": 10,
       "passes": true,
-      "notes": "Commit 2cfaecc. README rewritten as local-first narrative. New sections: What this fork does, Local-first / removed cloud features (table covering telemetry/Sentry/auto-update/cloud auth/Pro-Max subscription/background cloud agents/hosted API/hosted changelog), Where your data lives (macOS/Linux/Windows userData paths + SQLite note + no remote backup warning), Security notes (CSP, IPC origin validation, no real auth), Distribution (out-of-band internal package repo). Both ACs met: AC1 (Local-first section with all 8 removed features) ✓, AC2 (data-storage path note) ✓. Side effect on US-008: README rg sweep still returns 9 hits, all inside the required 'removed cloud features' table — intentional descriptive content per US-010 AC1, not references to live services."
+      "notes": "Commit 2cfaecc. README rewritten as local-first narrative. New sections: What this fork does, Local-first / removed cloud features (table covering telemetry/Sentry/auto-update/cloud auth/Pro-Max subscription/background cloud agents/hosted API/hosted changelog), Where your data lives (macOS/Linux/Windows userData paths + SQLite note + no remote backup warning), Security notes (CSP, IPC origin validation, no real auth), Distribution (out-of-band internal package repo). Both ACs met: AC1 (Local-first section with all 8 removed features) \u2713, AC2 (data-storage path note) \u2713. Side effect on US-008: README rg sweep still returns 9 hits, all inside the required 'removed cloud features' table \u2014 intentional descriptive content per US-010 AC1, not references to live services."
+    },
+    {
+      "id": "US-011",
+      "title": "Rename internal package name 21st-desktop \u2192 halotec-code-desktop",
+      "description": "As a Halotec operator, I want the npm package name to match the productName so build outputs and lockfile refer to halotec-code-desktop instead of the upstream name.",
+      "acceptanceCriteria": [
+        "package.json name = halotec-code-desktop",
+        "rg 21st-desktop package.json returns 0 hits",
+        "bun install completes",
+        "npm run package:linux still produces Halotec Code AppImage"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Renamed package.json name field. tsgo baseline unchanged (120 errors, matches HEAD). Lockfile bumped."
     }
   ]
 }
