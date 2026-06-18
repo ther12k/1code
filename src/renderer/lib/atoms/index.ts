@@ -186,6 +186,7 @@ export type SettingsTab =
   | "appearance"
   | "preferences"
   | "models"
+  | "custom-providers"
   | "skills"
   | "agents"
   | "mcp"
