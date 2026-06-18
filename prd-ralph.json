@@ -124,8 +124,8 @@
         "bun run build produces out/"
       ],
       "priority": 9,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Commit 5a7275d. Added @typescript/native-preview@7.0.0-dev.20260617.2 to devDependencies so the existing 'ts:check' script (which calls tsgo --noEmit) can resolve the binary. Validation: bun install ✓ 11s exit 0 (one benign peer-dep warning on zod 3.25.76); bun run ts:check ✓ completes with 120 errors (baseline — all pre-existing, 0 introduced by US-001..US-008); bun run build ✓ 3m42s, produces out/ (NODE_OPTIONS=--max-old-space-size=8192 required to avoid sandbox OOM)."
     },
     {
       "id": "US-010",
