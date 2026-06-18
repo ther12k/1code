@@ -152,6 +152,20 @@
       "priority": 1,
       "passes": true,
       "notes": "Renamed package.json name field. tsgo baseline unchanged (120 errors, matches HEAD). Lockfile bumped."
+    },
+    {
+      "id": "US-012",
+      "title": "Add .npmrc with legacy-peer-deps=true",
+      "description": "As a Halotec operator running npm install, I want peer-dep conflicts (e.g. zod 3 vs SDK peer zod 4) to be tolerated so installation succeeds without manual flags.",
+      "acceptanceCriteria": [
+        ".npmrc contains legacy-peer-deps=true",
+        "npm install completes without ERESOLVE error",
+        "postinstall (electron-rebuild) still runs",
+        "tsgo baseline unchanged"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "npm install verified clean in sandbox (1098 \u2192 956 pkgs after --legacy-peer-deps). tsgo 120 errors = baseline."
     }
   ]
 }
