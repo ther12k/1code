@@ -4,6 +4,14 @@ Local-first fork of [1Code](https://github.com/21st-dev/1code) by 21st.dev.
 Desktop UI for running Claude Code and Codex coding agents on your own
 machine, with all cloud-only features removed.
 
+> **Custom Providers** (Phase 2): route Claude and Codex through your own
+> LLM gateway — see [9router Quickstart](docs/9router-quickstart.md) or
+> [ADR 0001](docs/adr/0001-custom-providers.md). Verified endpoint:
+> `https://9router.halotec.my.id/v1`.
+>
+> See [`CHANGELOG.md`](CHANGELOG.md) for release notes and
+> `openspec/changes/add-custom-providers/` for the formal proposal.
+
 ## What this fork does
 
 - Runs Claude Code and Codex in isolated local git worktrees
