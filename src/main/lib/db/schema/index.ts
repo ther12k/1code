@@ -128,6 +128,30 @@ export const anthropicSettings = sqliteTable("anthropic_settings", {
   ),
 })
 
+// ============ CUSTOM PROVIDERS (Phase 2) ============
+// User-defined LLM provider endpoints compatible with Anthropic or OpenAI.
+// Used to route Claude/Codex traffic through user-controlled gateways
+// (9router, OpenRouter, LiteLLM, etc.).
+export const customProviders = sqliteTable("custom_providers", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  name: text("name").notNull(), // User-facing label, e.g. "9router"
+  type: text("type").notNull(), // "anthropic" | "openai"
+  baseUrl: text("base_url").notNull(), // e.g. https://9router.example.com
+  apiKeyEncrypted: text("api_key_encrypted").notNull(), // safeStorage-encrypted, base64
+  defaultModel: text("default_model"), // Optional pre-selected model
+  // JSON-serialized list of model ids fetched from /v1/models
+  modelsJson: text("models_json").$defaultFn(() => "[]"),
+  enabled: integer("enabled", { mode: "boolean" }).notNull().default(true),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
+    () => new Date(),
+  ),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(
+    () => new Date(),
+  ),
+})
+
 // ============ TYPE EXPORTS ============
 export type Project = typeof projects.$inferSelect
 export type NewProject = typeof projects.$inferInsert
@@ -140,3 +164,5 @@ export type NewClaudeCodeCredential = typeof claudeCodeCredentials.$inferInsert
 export type AnthropicAccount = typeof anthropicAccounts.$inferSelect
 export type NewAnthropicAccount = typeof anthropicAccounts.$inferInsert
 export type AnthropicSettings = typeof anthropicSettings.$inferSelect
+export type CustomProvider = typeof customProviders.$inferSelect
+export type NewCustomProvider = typeof customProviders.$inferInsert
