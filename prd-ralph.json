@@ -296,8 +296,8 @@
         "No-op when binaries already present (idempotent)"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "package/package:mac/package:win/package:linux/package:linux:full now chain 'node scripts/download-claude-binary.mjs' + 'node scripts/download-codex-binary.mjs' before electron-builder. Both scripts are idempotent (sha256 check + skip if binary present with correct hash), so no-op when binaries already exist. After clean clone + npm install + npm run package:linux, resources/bin/ contains codex binary + VERSION."
     },
     {
       "id": "US-023",
@@ -308,8 +308,8 @@
         "Sub-chat names generated on first message"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "generateSubChatName short-circuits when getApiUrl() returns '' (local-first packaged build or dev without MAIN_VITE_API_URL). Falls through to getFallbackName() instead of throwing ERR_INVALID_URL on the relative path. Comment explains root cause."
     },
     {
       "id": "US-024",

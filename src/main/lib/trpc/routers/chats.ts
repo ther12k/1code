@@ -1400,11 +1400,18 @@ export const chatsRouter = router({
           return { name: getFallbackName(input.userMessage) }
         }
 
-        // Online - use web API
+        // US-023: Local-first build has no upstream API endpoint.
+        // getApiUrl() returns "" when packaged (or MAIN_VITE_API_URL is unset
+        // in dev). Skipping the fetch avoids Node undici throwing
+        // ERR_INVALID_URL on the relative path it would otherwise produce.
+        const apiUrl = getApiUrl()
+        if (!apiUrl) {
+          console.log("[generateSubChatName] No API URL configured (local-first build), using fallback")
+          return { name: getFallbackName(input.userMessage) }
+        }
+
         const authManager = getAuthManager()
         const token = await authManager.getValidToken()
-        // Local-first build: no remote API endpoint, returns sentinel.
-        const apiUrl = getApiUrl()
 
         console.log(
           "[generateSubChatName] Online - calling API with token:",
