@@ -1,13 +1,14 @@
 /**
- * Remote API — no-op stub for the Halotec Code local-only fork.
+ * Remote API — no-op stub for the Halotec Code local-first fork.
  *
- * The fork does not contact 21st.dev / 1code.dev. All collection reads
- * return empty arrays, all writes are no-ops, and sandbox-file operations
- * throw a clear "local-only" error so any consumer that does try to fetch
- * a remote sandbox file gets a deterministic failure rather than a hang.
+ * The fork has no remote backend. All collection reads return empty
+ * arrays, all writes are no-ops, and sandbox file/diff operations
+ * throw a clear "local-only" error so any consumer that does try to
+ * fetch a remote sandbox file gets a deterministic failure rather than
+ * a hang.
  *
  * Consumers compile and run unchanged — they just see an empty remote
- * backend (no teams, no remote sandbox chats, no sandbox file fetches).
+ * backend.
  */
 
 const LOCAL_ONLY = "Halotec Code is a local-only build: remote API is disabled"

@@ -1204,7 +1204,7 @@ const AutomationsButton = memo(function AutomationsButton() {
   const automationsEnabled = useAtomValue(betaAutomationsEnabledAtom)
 
   const handleClick = useCallback(() => {
-    window.desktopApi.openExternal("https://21st.dev/agents/app/automations")
+    // Local-first build: no cloud automations backend to open.
   }, [])
 
   if (!automationsEnabled) return null

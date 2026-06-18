@@ -135,8 +135,7 @@ export function UpdateBanner() {
   }
 
   const handleOpenChangelog = () => {
-    // Open changelog URL
-    window.desktopApi?.openExternal("https://1code.dev/changelog")
+    // Open changelog URL — local-first build: no remote changelog page.
     // Dismiss the banner
     if (isMocking) {
       setMockStatus("dismissed")

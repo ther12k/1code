@@ -1,15 +1,14 @@
 /**
  * No-op tRPC client stub (Halotec Code local-only fork).
  *
- * The Halotec Code fork does not contact 21st.dev / 1code.dev. All remote
- * queries return empty / safe defaults, all remote mutations are no-ops.
- * Consumers compile and run unchanged — they just see an empty remote
- * backend (no Pro/Max/subscription data, no remote sandbox chats, no
- * automations, no remote GitHub/Linear integrations).
+ * The fork has no remote backend. All remote queries return safe
+ * defaults (empty arrays, "free" subscription, disconnected status),
+ * all remote mutations are no-ops. Consumers compile and run unchanged
+ * — they just see an empty remote backend.
  *
  * Return types are intentionally `any` to preserve the consumer-side
- * shape that the upstream tRPC client provided. This is a stub — the
- * runtime values are empty/safe, not the upstream real values.
+ * shape that the upstream tRPC client provided. Runtime values are
+ * empty/safe, not the upstream real values.
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

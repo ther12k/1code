@@ -1,10 +1,9 @@
 /**
  * No-op auto-updater for Halotec Code (local-first fork).
  *
- * Upstream 1code used `electron-updater` against `cdn.21st.dev` for in-app
- * updates. This module preserves the public surface so existing callers
- * in main/index.ts compile and run unchanged, but every function is a
- * no-op. No HTTP traffic is generated, no IPC handlers are registered.
+ * Preserves the public surface so existing callers compile and run
+ * unchanged, but every function is a no-op. No HTTP traffic is
+ * generated, no IPC handlers are registered.
  *
  * Distribution is expected to happen out-of-band (internal package
  * repository) per Halotec Code's release process.

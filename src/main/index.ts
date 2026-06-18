@@ -519,7 +519,7 @@ if (gotTheLock) {
 
     // Set app user model ID for Windows (different in dev to avoid taskbar conflicts)
     if (process.platform === "win32") {
-      app.setAppUserModelId(IS_DEV ? "dev.21st.1code.dev" : "dev.21st.1code")
+      app.setAppUserModelId(IS_DEV ? "dev.halotec.code" : "id.halotec.code")
     }
 
     console.log(`[App] Starting 1Code${IS_DEV ? " (DEV)" : ""}...`)
@@ -549,7 +549,7 @@ if (gotTheLock) {
       applicationName: "1Code",
       applicationVersion: app.getVersion(),
       version: `Claude Code ${claudeCodeVersion}`,
-      copyright: "Copyright © 2026 21st.dev",
+      copyright: "Copyright © 2026 Halotec",
     })
 
     // Update state variables removed for Halotec Code (US-005).
@@ -773,7 +773,7 @@ if (gotTheLock) {
               label: "Learn More",
               click: async () => {
                 const { shell } = await import("electron")
-                await shell.openExternal("https://21st.dev")
+                // Local-first build: no upstream project page to link to.
               },
             },
           ],

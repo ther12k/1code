@@ -5,8 +5,8 @@
   "description": "1Code - UI for parallel work with AI agents",
   "homepage": "https://internal.halotec/code-desktop",
   "author": {
-    "name": "21st.dev",
-    "email": "support@21st.dev"
+    "name": "Halotec",
+    "email": "code@halotec.my.id"
   },
   "main": "out/main/index.js",
   "scripts": {

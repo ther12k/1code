@@ -70,24 +70,7 @@ export function AgentsHelpPopover({
 
   useEffect(() => {
     let cancelled = false
-    window.desktopApi
-      .signedFetch("https://21st.dev/api/changelog/desktop?per_page=3")
-      .then((result) => {
-        if (cancelled) return
-        const data = result.data as {
-          releases?: Array<{ version?: string; content?: string }>
-        }
-        if (data?.releases) {
-          const items: ReleaseHighlight[] = []
-          for (const release of data.releases) {
-            if (release.version) {
-              items.push({ version: release.version, title: parseFirstHighlight(release.content || "") })
-            }
-          }
-          setHighlights(items)
-        }
-      })
-      .catch(() => {})
+    // Local-first build: changelog highlights are unavailable; leave empty.
     return () => {
       cancelled = true
     }
@@ -98,13 +81,11 @@ export function AgentsHelpPopover({
   }
 
   const handleChangelogClick = () => {
-    window.desktopApi.openExternal("https://1code.dev/agents/changelog")
+    // Local-first build: changelog is not hosted on a remote URL.
   }
 
   const handleReleaseClick = (version: string) => {
-    window.desktopApi.openExternal(
-      `https://1code.dev/agents/changelog#${version}`,
-    )
+    // Local-first build: release links are unavailable.
   }
 
   const handleKeyboardShortcutsClick = () => {

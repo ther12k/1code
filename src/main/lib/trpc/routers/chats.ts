@@ -4,6 +4,7 @@ import * as fs from "fs/promises"
 import * as path from "path"
 import simpleGit from "simple-git"
 import { z } from "zod"
+import { getApiUrl } from "../../config"
 import { getAuthManager } from "../../../index"
 import {
   trackPRCreated,
@@ -1276,8 +1277,8 @@ export const chatsRouter = router({
         try {
           const authManager = getAuthManager()
           const token = await authManager.getValidToken()
-          // Use localhost in dev, production otherwise
-          const apiUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://21st.dev"
+          // Use localhost in dev; local-first build has no remote fallback.
+          const apiUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : ""
 
           if (!token) {
             apiError = "No auth token available"
@@ -1402,7 +1403,8 @@ export const chatsRouter = router({
         // Online - use web API
         const authManager = getAuthManager()
         const token = await authManager.getValidToken()
-        const apiUrl = "https://21st.dev"
+        // Local-first build: no remote API endpoint, returns sentinel.
+        const apiUrl = getApiUrl()
 
         console.log(
           "[generateSubChatName] Online - calling API with token:",

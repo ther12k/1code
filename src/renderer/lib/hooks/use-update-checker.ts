@@ -1,11 +1,9 @@
 /**
  * No-op update-checker hook for Halotec Code (local-first fork).
  *
- * Upstream 1code checked `cdn.21st.dev` for updates via electron-updater.
- * The local fork does not contact any update server; updates are
- * distributed out-of-band. The hook is preserved so existing UI bindings
- * compile and render, but every action is a no-op and the state stays
- * permanently `idle` (no update available).
+ * Updates are distributed out-of-band. The hook is preserved so
+ * existing UI bindings compile and render, but every action is a no-op
+ * and the state stays permanently `idle` (no update available).
  */
 
 import { useCallback } from "react"

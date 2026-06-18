@@ -10,7 +10,8 @@ let cachedBaseUrl: string | null = null
 
 /**
  * Get the API base URL (cached after first call)
- * Always returns https://21st.dev (both in dev and production)
+ * Returns the value from the main process's getApiBaseUrl IPC, which
+ * resolves to localhost for the local-first fork.
  */
 export async function getApiBaseUrl(): Promise<string> {
   if (cachedBaseUrl) return cachedBaseUrl

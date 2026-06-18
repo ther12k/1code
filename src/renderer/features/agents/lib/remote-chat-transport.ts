@@ -6,8 +6,9 @@ let cachedApiBase: string | null = null
 
 async function getApiBase(): Promise<string> {
   if (!cachedApiBase) {
-    // Uses MAIN_VITE_API_URL in dev, "https://21st.dev" in production
-    cachedApiBase = await window.desktopApi?.getApiBaseUrl() || "https://21st.dev"
+    // Local-first build: API base resolves to localhost (or empty sentinel
+    // when packaged). Remote backend is intentionally unreachable.
+    cachedApiBase = await window.desktopApi?.getApiBaseUrl() || ""
   }
   return cachedApiBase
 }

@@ -1,9 +1,9 @@
 /**
  * Voice TRPC router
- * Provides voice-to-text transcription using OpenAI Whisper API
+ * Provides voice-to-text transcription using OpenAI Whisper API.
  *
- * For authenticated users (with subscription): uses 21st.dev backend
- * For open-source users: requires OPENAI_API_KEY in environment
+ * Local-first build: requires OPENAI_API_KEY in the environment.
+ * The upstream subscription-gated backend path was removed.
  */
 
 import { execSync } from "node:child_process"
@@ -184,7 +184,7 @@ export function clearOpenAIKeyCache(): void {
 }
 
 /**
- * Transcribe audio using 21st.dev backend (for authenticated users)
+ * Transcribe audio using the local Whisper backend (OpenAI API key required).
  */
 async function transcribeViaBackend(
   audioBuffer: Buffer,

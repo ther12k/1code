@@ -6,15 +6,16 @@ import { app } from "electron"
 const IS_DEV = !!process.env.ELECTRON_RENDERER_URL
 
 /**
- * Get the API base URL
- * In packaged app, ALWAYS use production URL to prevent localhost leaking into releases
- * In dev mode, allow override via MAIN_VITE_API_URL env variable
+ * Local-first build: API base URL resolves to localhost only.
+ * Packaged apps have no upstream backend; the value is a sentinel
+ * ("") so any straggling fetch call that accidentally hits it fails
+ * fast at the network layer instead of leaking to a remote host.
  */
 export function getApiUrl(): string {
   if (app.isPackaged) {
-    return "https://21st.dev"
+    return ""
   }
-  return import.meta.env.MAIN_VITE_API_URL || "https://21st.dev"
+  return import.meta.env.MAIN_VITE_API_URL || ""
 }
 
 /**
